@@ -16,7 +16,7 @@ export async function getShipmentHistory(page = 1, limit = 10) {
 
     const shipments = await prisma.shipment.findMany({
       where: {
-        userId: parseInt(session.user.id!),
+        userId: session.user.id,
       },
       orderBy: {
         createdAt: "desc",
@@ -27,7 +27,7 @@ export async function getShipmentHistory(page = 1, limit = 10) {
 
     const totalCount = await prisma.shipment.count({
       where: {
-        userId: parseInt(session.user.id!),
+        userId: session.user.id,
       },
     });
 

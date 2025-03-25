@@ -33,8 +33,6 @@ export async function updateTrackingStatus(formData: FormData) {
     status: formData.get("status"),
   };
 
-  console.log(rawData);
-
   // Validate and parse the form data using Zod
   const parsedData = updateTrackingStatusSchema.safeParse(rawData);
   if (!parsedData.success) {

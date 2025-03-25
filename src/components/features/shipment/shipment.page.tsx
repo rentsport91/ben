@@ -140,7 +140,7 @@ export const ShipmentsPage = ({ shipments }: { shipments: Shipment[] }) => {
   };
 
   const handleViewDetails = (
-    e: MouseEvent<HTMLDivElement, MouseEvent>,
+    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     shipmentId: string
   ) => {
     e.stopPropagation();
@@ -148,7 +148,7 @@ export const ShipmentsPage = ({ shipments }: { shipments: Shipment[] }) => {
   };
 
   const handleDownloadReceipt = (
-    e: MouseEvent<HTMLDivElement, MouseEvent>,
+    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     shipment: Shipment
   ) => {
     e.stopPropagation();
@@ -159,7 +159,7 @@ export const ShipmentsPage = ({ shipments }: { shipments: Shipment[] }) => {
 
   // Function to handle generate label action
   const handleGenerateLabel = (
-    e: MouseEvent<HTMLDivElement, MouseEvent>,
+    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     shipment: any
   ) => {

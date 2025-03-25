@@ -1,42 +1,88 @@
 import TrackingResult from "@/components/features/tracking.result";
 import Link from "next/link";
 import { prisma } from "@/constants/config/db";
-
-interface TrackingResultsPageProps {
-  searchParams: {
-    id?: string;
-  };
-}
+// import { z } from "zod";
 
 async function getTrackingData(trackingNumber: string) {
   const result = await prisma.shipment.findUnique({
     where: { trackingNumber },
-    include: {
-      TrackingUpdates: { orderBy: { timestamp: "asc" } },
-      packages: true,
+    select: {
+      trackingNumber: true, // guaranteed to be non-null
+      estimatedDelivery: true,
+      originAddress: true,
+      originCity: true,
+      originState: true,
+      originPostalCode: true,
+      originCountry: true,
+      destinationAddress: true,
+      destinationCity: true,
+      destinationState: true,
+      destinationPostalCode: true,
+      destinationCountry: true,
+      serviceType: true,
+      TrackingUpdates: {
+        select: {
+          id: true,
+          location: true,
+          message: true,
+          status: true,
+          timestamp: true,
+        },
+      },
+      createdAt: true,
     },
   });
 
   if (!result) return null;
 
-  return {
-    ...result,
-    packages: result.packages.map((pkg) => ({
-      ...pkg,
-      createdAt: pkg.createdAt.toISOString(),
-      updatedAt: pkg.updatedAt.toISOString(),
-    })),
-    TrackingUpdates: result.TrackingUpdates.map((update) => ({
-      ...update,
-      timestamp: update.timestamp.toISOString(),
-    })),
-  };
+  // const trackingEventSchema = z.object({
+  //   id: z.string(),
+  //   timestamp: z.date(),
+  //   location: z.string().nullable(),
+  //   status: z.string(),
+  //   message: z.string(),
+  // });
+
+  // const trackingDataSchema = z.object({
+  //   trackingNumber: z.string(),
+  //   estimatedDelivery: z.date(),
+  //   originAddress: z.string(),
+  //   originCity: z.string(),
+  //   originState: z.string(),
+  //   originPostalCode: z.string(),
+  //   originCountry: z.string(),
+  //   destinationAddress: z.string(),
+  //   destinationCity: z.string(),
+  //   destinationState: z.string(),
+  //   destinationPostalCode: z.string(),
+  //   destinationCountry: z.string(),
+  //   serviceType: z.string(),
+  //   TrackingUpdates: z.array(trackingEventSchema),
+  //   createdAt: z.date(),
+  // });
+
+  // const data = trackingDataSchema.safeParse(result);
+
+  // if (!data.success) {
+  //   console.error(
+  //     "Data does not match TrackingData type:",
+  //     data.error.flatten()
+  //   );
+  //   // Handle the error or throw an exception
+  // } else {
+  //   const validData = data.data;
+  //   // validData now has type TrackingData
+  // }
+
+  return result;
 }
 
 export default async function TrackingResultsPage({
   searchParams,
-}: TrackingResultsPageProps) {
-  const trackingNumber = searchParams.id ?? "";
+}: {
+  searchParams: Promise<{ [id: string]: string | undefined }>;
+}) {
+  const { id: trackingNumber } = await searchParams;
   if (!trackingNumber) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -61,6 +107,11 @@ export default async function TrackingResultsPage({
   }
 
   const trackingData = await getTrackingData(trackingNumber);
+  console.log(trackingData);
+
+  if (!trackingData?.trackingNumber) {
+    return <div>Invalid tracking number</div>;
+  }
 
   try {
     return <TrackingResult data={trackingData} />;

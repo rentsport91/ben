@@ -1,36 +1,20 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 
 interface TrackingEvent {
   id: string;
-  timestamp: string;
+  timestamp: Date;
   location: string | null;
-  status: string;
+  status: string | null; // Allow null here
   message: string;
-}
-
-interface Package {
-  id: string;
-  packageType: string;
-  weight: number;
-  length: number;
-  width: number;
-  height: number;
-  declaredValue: number;
-  description: string;
-  pieces: number;
-  dangerous: boolean;
-  insurance: boolean;
 }
 
 interface TrackingData {
   trackingNumber: string;
-  status?: string; // made optional
-  estimatedDelivery: string;
-  deliveredAt: string | null;
-  isPaid: boolean;
+  estimatedDelivery: Date;
   originAddress: string;
   originCity: string;
   originState: string;
@@ -42,26 +26,25 @@ interface TrackingData {
   destinationPostalCode: string;
   destinationCountry: string;
   serviceType: string;
-  specialInstructions?: string | null;
   TrackingUpdates: TrackingEvent[];
-  packages: Package[];
+  createdAt: Date;
 }
 
-interface TrackingResultProps {
-  data: TrackingData | null;
-}
+type TrackingResultProps = {
+  data: TrackingData;
+};
 
 export default function TrackingResult({ data }: TrackingResultProps) {
   const [activeTab, setActiveTab] = useState<"timeline" | "details">(
     "timeline"
   );
+
   const formatDate = (input: string | Date): string => {
     try {
-      // If the input is already a Date, use it directly; otherwise, parse it
       const date = input instanceof Date ? input : parseISO(input);
       return format(date, "MMM d, yyyy h:mm a");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
       return typeof input === "string" ? input : input.toString();
     }
   };
@@ -74,7 +57,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
             Error Retrieving Tracking Information
           </h1>
           <p className="text-gray-500 mb-6">
-            We were unable to find tracking information for the number
+            We were unable to find tracking information for the provided number.
           </p>
           <Link
             href="/track"
@@ -86,7 +69,8 @@ export default function TrackingResult({ data }: TrackingResultProps) {
       </div>
     );
   }
-  // If TrackingUpdates is non-empty, assume the first one is the latest update
+
+  // Assume the latest event is the last one in the timeline (ordered ascending)
   const currentStatus =
     data.TrackingUpdates.length > 0
       ? data.TrackingUpdates[data.TrackingUpdates.length - 1].status
@@ -95,10 +79,10 @@ export default function TrackingResult({ data }: TrackingResultProps) {
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg container mx-auto">
       {/* Header */}
-      <div className=" px-4 py-5 sm:px-6 bg-gray-50">
+      <div className="px-4 py-5 sm:px-6 bg-gray-50">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
           <div>
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-gray-900">
               Tracking Information
             </h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500">
@@ -138,41 +122,41 @@ export default function TrackingResult({ data }: TrackingResultProps) {
         </div>
       </div>
 
-      {/* Tab navigation */}
+      {/* Tab Navigation */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex" aria-label="Tabs">
           <button
             onClick={() => setActiveTab("timeline")}
-            className={`${
+            className={`w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm ${
               activeTab === "timeline"
                 ? "border-secondary text-secondary"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            } w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm`}
+            }`}
           >
             Timeline
           </button>
           <button
             onClick={() => setActiveTab("details")}
-            className={`${
+            className={`w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm ${
               activeTab === "details"
                 ? "border-secondary text-secondary"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            } w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm`}
+            }`}
           >
             Shipment Details
           </button>
         </nav>
       </div>
 
-      {/* Tab content */}
+      {/* Tab Content */}
       <div className="px-4 py-5 sm:p-6">
         {activeTab === "timeline" ? (
           <div className="flow-root">
             <ul className="-mb-8">
-              {data.TrackingUpdates.map((event, eventIdx) => (
+              {data.TrackingUpdates.map((event, idx) => (
                 <li key={event.id}>
                   <div className="relative pb-8">
-                    {eventIdx !== data.TrackingUpdates.length - 1 && (
+                    {idx !== data.TrackingUpdates.length - 1 && (
                       <span
                         className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
                         aria-hidden="true"
@@ -259,8 +243,8 @@ export default function TrackingResult({ data }: TrackingResultProps) {
   );
 }
 
-function getStatusColor(status: string) {
-  switch (status.toLowerCase()) {
+function getStatusColor(status: string | null): string {
+  switch (status?.toLowerCase()) {
     case "delivered":
       return "bg-green-200 text-green-800";
     case "in transit":
@@ -274,7 +258,7 @@ function getStatusColor(status: string) {
     case "information received":
       return "bg-gray-200 text-gray-800";
     case "failed":
-      return "bg-red-200 text-gray-800";
+      return "bg-red-200 text-red-800";
     default:
       return "bg-gray-200 text-gray-800";
   }

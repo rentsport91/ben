@@ -40,7 +40,6 @@ export function TrackingUpdateSheet({
     const formData = new FormData(formRef.current!);
     // Include shipment id and, if applicable, the tracking update id.
     formData.set("shipmentId", shipment.id);
-    console.log(shipment.id);
 
     if (trackingUpdateId) {
       formData.set("trackingUpdateId", trackingUpdateId);

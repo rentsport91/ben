@@ -21,8 +21,6 @@ const TrackingForm = () => {
       return;
     }
 
-    console.log("pressed");
-
     setIsLoading(true);
 
     // Simulate API call

@@ -26,8 +26,8 @@ model User {
 
 model Shipment {
   id                String    @id @default(cuid())
-  trackingNumber    String?   @unique
-  estimatedDelivery DateTime?
+  trackingNumber    String    @unique
+  estimatedDelivery DateTime
   deliveredAt       DateTime?
   isPaid            Boolean   @default(false) // New field to track payment status
 
