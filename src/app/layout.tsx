@@ -12,8 +12,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Shipmaster Logistics",
+  title: "Euroswift Logistics",
   description: "Our Global Shipping Solutions",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
