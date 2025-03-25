@@ -33,7 +33,7 @@ const TrackingForm = () => {
       });
       setTrackingNumber("");
       router.push(
-        `/tracking/results?number=${encodeURIComponent(trackingNumber.trim())}`
+        `/track/results?id=${encodeURIComponent(trackingNumber.trim())}`
       );
     }, 1500);
   };
@@ -54,7 +54,7 @@ const TrackingForm = () => {
 
         <Input
           type="text"
-          placeholder="Enter your tracking number"
+          placeholder="Tracking Number (e.g., SM12345678)"
           value={trackingNumber}
           onChange={(e) => setTrackingNumber(e.target.value)}
           className="flex-grow border-0 bg-transparent text-lg h-14 px-4 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-400"

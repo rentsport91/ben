@@ -1,35 +1,19 @@
-"use client";
-
-import { FormEvent, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Loader2, Mail, Package } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import Link from "next/link";
+import { AnimatePresence } from "motion/react";
+import { Package } from "lucide-react";
+import { auth } from "~/auth";
 import Image from "next/image";
+import { MotionDiv } from "@/components/motion.div";
+import { redirect } from "next/navigation";
+import ClientAuthWrapper from "./client.auth.wrapper";
 
-const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate API request
-    setTimeout(() => {
-      setIsLoading(false);
-      // Handle success - redirect or show success message
-    }, 1500);
-  };
-
+const LoginPage = async () => {
+  const session = await auth();
+  if (session?.user) redirect("/");
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-4xl grid md:grid-cols-2 bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Left Column - Brand & Info */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -78,7 +62,7 @@ const LoginPage = () => {
           <div className="text-sm text-gray-300">
             <p>&copy; 2025 EuroSwift Shipping. All rights reserved.</p>
           </div>
-        </motion.div>
+        </MotionDiv>
 
         {/* Right Column - Auth Forms */}
         <div className="p-8 sm:p-10">
@@ -92,101 +76,14 @@ const LoginPage = () => {
           </div>
 
           <AnimatePresence mode="wait">
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <form onSubmit={handleSubmit}>
-                <div className="space-y-4 mb-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email Address</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                      <Input
-                        id="login-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="login-password">Password</Label>
-                      <Link
-                        href="/forgot-password"
-                        className="text-xs text-secondary hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <div className="relative">
-                      <Input
-                        id="login-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
-                        className="pr-10"
-                        required
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="remember" />
-                    <Label htmlFor="remember" className="text-sm font-normal">
-                      Remember me for 30 days
-                    </Label>
-                  </div>
-                </div>
-                {/* Submit Button */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    type="submit"
-                    className="w-full bg-secondary hover:bg-secondary hover:opacity-80 text-white py-2 h-11 mt-2"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Signing in...
-                      </>
-                    ) : (
-                      " Sign In"
-                    )}
-                  </Button>
-                </motion.div>
-                {/* Toggle between forms */}
-                <div className="mt-6 text-center text-sm">
-                  <p className="text-gray-600">
-                    Don&apos;t have an account?
-                    <button
-                      type="button"
-                      className="ml-1 text-secondary hover:underline font-medium"
-                    >
-                      <Link href={"/register"}>Sign up</Link>
-                    </button>
-                  </p>
-                </div>
-              </form>
-            </motion.div>
+              <ClientAuthWrapper />
+            </MotionDiv>
           </AnimatePresence>
         </div>
       </div>

@@ -4,75 +4,98 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 
 interface TrackingEvent {
+  id: string;
   timestamp: string;
-  location: string;
+  location: string | null;
   status: string;
-  description: string;
+  message: string;
 }
 
-interface ShipmentDetails {
-  sender: string;
-  recipient: string;
-  service: string;
-  weight: string;
-  dimensions: string;
+interface Package {
+  id: string;
+  packageType: string;
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+  declaredValue: number;
+  description: string;
   pieces: number;
+  dangerous: boolean;
+  insurance: boolean;
 }
 
 interface TrackingData {
   trackingNumber: string;
-  status: string;
+  status?: string; // made optional
   estimatedDelivery: string;
+  deliveredAt: string | null;
+  isPaid: boolean;
+  originAddress: string;
+  originCity: string;
+  originState: string;
+  originPostalCode: string;
   originCountry: string;
+  destinationAddress: string;
+  destinationCity: string;
+  destinationState: string;
+  destinationPostalCode: string;
   destinationCountry: string;
-  currentLocation: string;
-  events: TrackingEvent[];
-  shipmentDetails: ShipmentDetails;
+  serviceType: string;
+  specialInstructions?: string | null;
+  TrackingUpdates: TrackingEvent[];
+  packages: Package[];
 }
 
 interface TrackingResultProps {
-  data: TrackingData;
+  data: TrackingData | null;
 }
 
 export default function TrackingResult({ data }: TrackingResultProps) {
   const [activeTab, setActiveTab] = useState<"timeline" | "details">(
     "timeline"
   );
-
-  const formatDate = (dateString: string) => {
+  const formatDate = (input: string | Date): string => {
     try {
-      const date = parseISO(dateString);
+      // If the input is already a Date, use it directly; otherwise, parse it
+      const date = input instanceof Date ? input : parseISO(input);
       return format(date, "MMM d, yyyy h:mm a");
     } catch (e) {
-      console.log(e);
-
-      return dateString;
+      console.error(e);
+      return typeof input === "string" ? input : input.toString();
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "delivered":
-        return "bg-green-100 text-green-800";
-      case "in transit":
-        return "bg-blue-100 text-blue-800";
-      case "arrived":
-        return "bg-purple-100 text-purple-800";
-      case "departed":
-        return "bg-indigo-100 text-indigo-800";
-      case "picked up":
-        return "bg-yellow-100 text-yellow-800";
-      case "information received":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  if (!data) {
+    return (
+      <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-red-600 mb-4">
+            Error Retrieving Tracking Information
+          </h1>
+          <p className="text-gray-500 mb-6">
+            We were unable to find tracking information for the number
+          </p>
+          <Link
+            href="/track"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Try Again
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  // If TrackingUpdates is non-empty, assume the first one is the latest update
+  const currentStatus =
+    data.TrackingUpdates.length > 0
+      ? data.TrackingUpdates[data.TrackingUpdates.length - 1].status
+      : "";
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      {/* Tracking header */}
-      <div className="px-4 py-5 sm:px-6 bg-gray-50">
+    <div className="bg-white shadow overflow-hidden sm:rounded-lg container mx-auto">
+      {/* Header */}
+      <div className=" px-4 py-5 sm:px-6 bg-gray-50">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
           <div>
             <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -86,10 +109,10 @@ export default function TrackingResult({ data }: TrackingResultProps) {
           <div className="mt-3 sm:mt-0">
             <span
               className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getStatusColor(
-                data.status
+                currentStatus
               )}`}
             >
-              {data.status}
+              {currentStatus}
             </span>
           </div>
         </div>
@@ -99,7 +122,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
             <p className="mt-1 text-sm text-gray-900">{data.originCountry}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">To </p>
+            <p className="text-sm font-medium text-gray-500">To</p>
             <p className="mt-1 text-sm text-gray-900">
               {data.destinationCountry}
             </p>
@@ -122,7 +145,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
             onClick={() => setActiveTab("timeline")}
             className={`${
               activeTab === "timeline"
-                ? "border-indigo-500 text-indigo-600"
+                ? "border-secondary text-secondary"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             } w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm`}
           >
@@ -132,7 +155,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
             onClick={() => setActiveTab("details")}
             className={`${
               activeTab === "details"
-                ? "border-indigo-500 text-indigo-600"
+                ? "border-secondary text-secondary"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             } w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm`}
           >
@@ -146,15 +169,15 @@ export default function TrackingResult({ data }: TrackingResultProps) {
         {activeTab === "timeline" ? (
           <div className="flow-root">
             <ul className="-mb-8">
-              {data.events.map((event, eventIdx) => (
-                <li key={eventIdx}>
+              {data.TrackingUpdates.map((event, eventIdx) => (
+                <li key={event.id}>
                   <div className="relative pb-8">
-                    {eventIdx !== data.events.length - 1 ? (
+                    {eventIdx !== data.TrackingUpdates.length - 1 && (
                       <span
                         className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
                         aria-hidden="true"
                       />
-                    ) : null}
+                    )}
                     <div className="relative flex items-start space-x-3">
                       <div className="relative">
                         <div
@@ -186,11 +209,13 @@ export default function TrackingResult({ data }: TrackingResultProps) {
                           </p>
                         </div>
                         <div className="mt-2 text-sm text-gray-700">
-                          <p>{event.description}</p>
+                          <p>{event.message}</p>
                         </div>
-                        <div className="mt-1 text-sm text-gray-500">
-                          <p>{event.location}</p>
-                        </div>
+                        {event.location && (
+                          <div className="mt-1 text-sm text-gray-500">
+                            <p>{event.location}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -202,15 +227,19 @@ export default function TrackingResult({ data }: TrackingResultProps) {
           <div className="border-t border-gray-200">
             <dl>
               <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Sender </dt>
+                <dt className="text-sm font-medium text-gray-500">
+                  Origin Address
+                </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.shipmentDetails.sender}
+                  {data.originAddress}
                 </dd>
               </div>
               <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Recipient</dt>
+                <dt className="text-sm font-medium text-gray-500">
+                  Destination Address
+                </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.shipmentDetails.recipient}
+                  {data.destinationAddress}
                 </dd>
               </div>
               <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -218,86 +247,35 @@ export default function TrackingResult({ data }: TrackingResultProps) {
                   Service Type
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.shipmentDetails.service}
+                  {data.serviceType}
                 </dd>
               </div>
-              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Weight </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.shipmentDetails.weight}
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Dimensions
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.shipmentDetails.dimensions}
-                </dd>
-              </div>
-              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Number of Pieces
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.shipmentDetails.pieces}
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Current Location
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.currentLocation}
-                </dd>
-              </div>
+              {/* Additional shipment details can be added here */}
             </dl>
           </div>
         )}
       </div>
-
-      {/* Action buttons */}
-      <div className="px-4 py-3 bg-gray-50 text-right sm:px-6 border-t border-gray-200">
-        <div className="flex justify-end space-x-3">
-          <Link
-            href={`/tracking/print?number=${data.trackingNumber}`}
-            className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <svg
-              className="mr-2 -ml-1 h-5 w-5 text-gray-500"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Print
-          </Link>
-          <button
-            type="button"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <svg
-              className="mr-2 -ml-1 h-5 w-5"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-              <path
-                fillRule="evenodd"
-                d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Get Updates
-          </button>
-        </div>
-      </div>
     </div>
   );
+}
+
+function getStatusColor(status: string) {
+  switch (status.toLowerCase()) {
+    case "delivered":
+      return "bg-green-200 text-green-800";
+    case "in transit":
+      return "bg-blue-200 text-blue-800";
+    case "arrived":
+      return "bg-purple-200 text-purple-800";
+    case "departed":
+      return "bg-indigo-200 text-indigo-800";
+    case "picked up":
+      return "bg-yellow-200 text-yellow-800";
+    case "information received":
+      return "bg-gray-200 text-gray-800";
+    case "failed":
+      return "bg-red-200 text-gray-800";
+    default:
+      return "bg-gray-200 text-gray-800";
+  }
 }

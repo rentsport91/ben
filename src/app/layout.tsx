@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
+
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
@@ -10,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Hiship Logistics",
+  title: "Shipmaster Logistics",
   description: "Our Global Shipping Solutions",
 };
 
@@ -22,8 +24,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className}  antialiased`}>
-        <main className="">{children}</main>
-        <Toaster />
+        <SessionProvider>
+          <main className="">{children}</main>
+          <Toaster />
+        </SessionProvider>
       </body>
     </html>
   );

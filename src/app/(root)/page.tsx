@@ -1,12 +1,12 @@
-import { Archievement } from "@/components/archieve";
-import { Choice } from "@/components/choice";
-import RateCalculator from "@/components/features/rate.quote.calculator";
+import { Archievement } from "@/components/features/public/archieve";
+import { Choice } from "@/components/features/public/choice";
 import { GlobalNetwork } from "@/components/global.network";
-import { Hero } from "@/components/hero";
-import { Quota } from "@/components/quote";
-import { Service } from "@/components/Services";
+import { Hero } from "@/components/features/public/hero";
+// import { Quota } from "@/components/features/public/quote";
+import { Service } from "@/components/features/public/Services";
+// import { QuotaRateCalculator } from "@/components/features/quoteCalculator/rate.calculator";
 
-export default function Home() {
+export default async function Home() {
   return (
     <main className="">
       <Hero />
@@ -14,8 +14,6 @@ export default function Home() {
       <Service />
       <Archievement />
       <Choice />
-      <Quota />
-      <RateCalculator />
     </main>
   );
 }
