@@ -23,7 +23,7 @@ const RegisterPage = async () => {
           <div>
             <div className="mb-8">
               <Image
-                src="/images/logo.svg"
+                src="/logos/logo-dark.png"
                 alt="EuroSwift Logo"
                 width={150}
                 height={50}
