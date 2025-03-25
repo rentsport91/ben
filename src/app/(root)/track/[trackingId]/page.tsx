@@ -107,7 +107,6 @@ export default async function TrackingResultsPage({
   }
 
   const trackingData = await getTrackingData(trackingNumber);
-  console.log(trackingData);
 
   if (!trackingData?.trackingNumber) {
     return <div>Invalid tracking number</div>;

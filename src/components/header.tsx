@@ -16,7 +16,7 @@ import {
   // Phone,
   LogIn,
   LogOut,
-  UserPlus,
+  // UserPlus,
   // TextQuote,
   LayoutDashboard,
 } from "lucide-react";
@@ -54,7 +54,7 @@ const mainNavItems = [
 const authNavItems = {
   unauthenticated: [
     { href: "/login", label: "Login", icon: LogIn },
-    { href: "/register", label: "Register", icon: UserPlus },
+    // { href: "/register", label: "Register", icon: UserPlus },
   ],
   authenticated: [
     { href: "/profile", label: "Profile", icon: User },
