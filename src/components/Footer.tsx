@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Mail, ArrowRight, Phone, MapPin } from "lucide-react";
+import { Mail, ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -26,7 +26,13 @@ export const Footer = () => {
             </p>
             <div className="space-y-4">
               <div className="flex items-center">
-                <Phone size={18} className="text-shipping-600 mr-3" />
+                <Image
+                  src="/images/whatsapp.png"
+                  width={18}
+                  height={18}
+                  alt="whatsApp logo"
+                  className="mr-2"
+                />
                 <span className="text-gray-700">+44 7349 381036</span>
               </div>
               <div className="flex items-center">
@@ -95,10 +101,10 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/express"
+                  href="/services"
                   className="text-gray-600 hover:text-shipping-600 transition-colors"
                 >
-                  Express Shipping
+                  Ground Shipping
                 </Link>
               </li>
               <li>
@@ -111,10 +117,19 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/ecommerce"
+                  href="/services"
                   className="text-gray-600 hover:text-shipping-600 transition-colors"
                 >
-                  E-commerce Solutions
+                  Ocean Freight
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/services"
+                  className="text-gray-600 hover:text-shipping-600 transition-colors"
+                >
+                  Warehousing
                 </Link>
               </li>
               <li>
@@ -122,15 +137,7 @@ export const Footer = () => {
                   href="/support"
                   className="text-gray-600 hover:text-shipping-600 transition-colors"
                 >
-                  Customs Support
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/"
-                  className="text-gray-600 hover:text-shipping-600 transition-colors"
-                >
-                  Business Shipping
+                  Support
                 </Link>
               </li>
             </ul>
@@ -154,9 +161,10 @@ export const Footer = () => {
                 />
                 <Button
                   size="sm"
-                  className="absolute right-1 top-1 h-9 w-9 p-0 flex items-center justify-center bg-shipping-600 hover:bg-shipping-700"
+                  className=" text-white mt-5 hover:bg-top-header/80 bg-top-header cursor-pointer"
                 >
                   <ArrowRight size={16} />
+                  Submit
                 </Button>
               </div>
               <p className="text-xs text-gray-500">

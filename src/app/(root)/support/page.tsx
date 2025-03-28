@@ -33,6 +33,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 // Support Request Form Schema
 const supportRequestSchema = z.object({
@@ -93,9 +94,17 @@ export default function SupportPage() {
   // Support Contact Channels
   const supportChannels = [
     {
-      icon: Phone,
-      title: "Phone Support",
-      description: "Speak directly with our logistics experts",
+      image: (
+        <Image
+          src="/images/whatsapp.png"
+          width={50}
+          height={50}
+          alt="whatsApp logo"
+          className="mr-2"
+        />
+      ),
+      title: "WhatsApp Support",
+      description: "Chat directly with our logistics experts",
       details: "+44 7349 38103",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
@@ -163,7 +172,11 @@ export default function SupportPage() {
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <channel.icon className={`h-12 w-12 ${channel.color}`} />
+                  {channel.icon ? (
+                    <channel.icon className={`h-12 w-12 ${channel.color}`} />
+                  ) : (
+                    channel.image
+                  )}
                 </div>
               </CardHeader>
               <CardContent>

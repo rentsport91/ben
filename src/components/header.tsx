@@ -116,13 +116,13 @@ export const Header = () => {
             {/* Right side */}
             <div className="flex items-center gap-10">
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
-                <Link href={"/help-center"} className="hover:underline">
+                <Link href={"/support"} className="hover:underline">
                   Help Center
                 </Link>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
-                <Link href={"/find-store"} className="hover:underline">
+                <Link href={"/"} className="hover:underline">
                   Find Store
                 </Link>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
