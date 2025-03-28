@@ -165,7 +165,7 @@ export const Header = () => {
         </nav>
 
         {isAuthenticated ? (
-          <div className="flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3 ">
             <Notifications />
             <Button variant="outline">Active 3</Button>
             <Link
@@ -257,14 +257,32 @@ export const Header = () => {
                 <div className="flex items-center justify-between">
                   <SheetHeader>
                     <SheetTitle>
-                      <Link href="/" className="flex items-center space-x-2">
-                        <Ship className="h-5 w-5" />
-                        <span className="text-lg font-bold">ShipMaster</span>
-                      </Link>
+                      <Logo />
                     </SheetTitle>
                   </SheetHeader>
                 </div>
-
+                <div
+                  className={cn(
+                    "block bg-top-header transition-all duration-300 overflow-hidden m-3 rounded-md"
+                  )}
+                >
+                  <div className="">
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
+                        <MapPin className="text-secondary" size={20} />
+                        <span>71 Cherry Court Southampton SO53 5PD</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
+                        <Mail className="text-secondary" size={20} />
+                        <span>info@logistex.com</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
+                        <Clock className="text-secondary" size={20} />
+                        <span>Mon - Sat: 8:00 am - 5:00 pm</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <nav className="flex flex-col space-y-1">
                   {mainNavItems.map((item) => {
                     const isActive = pathname === item.href;
@@ -299,7 +317,14 @@ export const Header = () => {
                             "User"}
                         </p>
                       </div>
-
+                      <Notifications />
+                      <Button variant="outline">Active 3</Button>
+                      <Link
+                        href="/shipments/create"
+                        className="bg-secondary text-white font-medium px-3 py-2 rounded-md"
+                      >
+                        Create Shipment
+                      </Link>
                       {authNavItems.authenticated.map((item) => {
                         const Icon = item.icon;
                         return (
