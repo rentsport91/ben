@@ -17,11 +17,16 @@ interface Sender {
   email: string;
 }
 
+// Type '{ createdAt: Date; trackingNumber: string; estimatedDelivery: Date; originAddress: string; originCity: string; originState: string; originPostalCode: string; originCountry: string; ... 9 more ...; Sender: { ...; } | null; }' is not assignable to type 'TrackingData'.
+//   Types of property 'packages' are incompatible.
+//     Type '{ length: number; packageType: string; width: number; height: number; declaredValue: number; }[]' is not assignable to type 'Package[]'.
+//       Property 'package' is missing in type '{ length: number; packageType: string; width: number; height: number; declaredValue: number; }' but required in type 'Package'.
+
 interface Package {
   height: number;
   width: number;
   length: number;
-  package: string;
+  packageType: string;
   declaredValue: number | null;
 }
 
@@ -45,9 +50,9 @@ interface TrackingData {
   serviceType: string;
   TrackingUpdates: TrackingEvent[];
   createdAt: Date;
-  Sender: Sender;
+  Sender: Sender | null;
   recipient: Recipient;
-  packages: Package;
+  packages: Package[];
 }
 
 type TrackingResultProps = {
@@ -59,7 +64,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
     "timeline"
   );
 
-  console.log(data.packages);
+  console.log(data);
 
   const formatDate = (input: string | Date): string => {
     try {
@@ -237,7 +242,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
                   Origin Name
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.Sender.name}
+                  {data.Sender?.name}
                 </dd>
               </div>
               <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -278,7 +283,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
                   Package Type
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.packages.package}
+                  {data.packages[0].packageType}
                 </dd>
               </div>
               <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

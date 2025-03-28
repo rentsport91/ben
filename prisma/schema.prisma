@@ -66,7 +66,7 @@ model Package {
   length        Int
   width         Int
   height        Int
-  declaredValue Int
+  declaredValue Int?
   description   String
   pieces        Int
   dangerous     Boolean

@@ -51,45 +51,6 @@ async function getTrackingData(trackingNumber: string) {
 
   if (!result) return null;
 
-  // const trackingEventSchema = z.object({
-  //   id: z.string(),
-  //   timestamp: z.date(),
-  //   location: z.string().nullable(),
-  //   status: z.string(),
-  //   message: z.string(),
-  // });
-
-  // const trackingDataSchema = z.object({
-  //   trackingNumber: z.string(),
-  //   estimatedDelivery: z.date(),
-  //   originAddress: z.string(),
-  //   originCity: z.string(),
-  //   originState: z.string(),
-  //   originPostalCode: z.string(),
-  //   originCountry: z.string(),
-  //   destinationAddress: z.string(),
-  //   destinationCity: z.string(),
-  //   destinationState: z.string(),
-  //   destinationPostalCode: z.string(),
-  //   destinationCountry: z.string(),
-  //   serviceType: z.string(),
-  //   TrackingUpdates: z.array(trackingEventSchema),
-  //   createdAt: z.date(),
-  // });
-
-  // const data = trackingDataSchema.safeParse(result);
-
-  // if (!data.success) {
-  //   console.error(
-  //     "Data does not match TrackingData type:",
-  //     data.error.flatten()
-  //   );
-  //   // Handle the error or throw an exception
-  // } else {
-  //   const validData = data.data;
-  //   // validData now has type TrackingData
-  // }
-
   return result;
 }
 
