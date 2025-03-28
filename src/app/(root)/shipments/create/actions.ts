@@ -42,7 +42,6 @@ export async function createShipment(formData: FormData) {
         error: "Unauthorized. Please sign in to create a shipment.",
       };
     }
-    console.log(session.user);
 
     // Parse formData into an object
     const rawFormData: Record<string, any> = {};

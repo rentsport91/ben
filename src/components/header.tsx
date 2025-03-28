@@ -4,21 +4,17 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import {
   Ship,
   Menu,
   User,
   Package,
-  Home,
-  // Info,
-  // Phone,
-  LogIn,
   LogOut,
-  // UserPlus,
-  // TextQuote,
   LayoutDashboard,
+  MapPin,
+  Mail,
+  Clock,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -41,25 +37,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
 import { Logo } from "./logo";
+import { Notifications } from "./features/notification/notification";
 
 // Navigation items definition
 const mainNavItems = [
-  { href: "/", label: "Home", icon: Home },
-  // { href: "/about", label: "About", icon: Info },
-  // { href: "/contact", label: "Contact", icon: Phone },
-  { href: "/track", label: "Track Shipment", icon: Package },
-  // { href: "/quota", label: "Get a Quota", icon: TextQuote },
+  { href: "/", label: "Home" },
+  { href: "/ship", label: "Ship" },
+  { href: "/track", label: "Track" },
+  { href: "/services", label: "Services" },
+  { href: "/support", label: "Support" },
 ];
 
 const authNavItems = {
   unauthenticated: [
-    { href: "/login", label: "Login", icon: LogIn },
-    // { href: "/register", label: "Register", icon: UserPlus },
+    { href: "/register", label: "Register" },
+    { href: "/login", label: "Login" },
   ],
   authenticated: [
     { href: "/profile", label: "Profile", icon: User },
     { href: "/shipments/history", label: "My Shipments", icon: Package },
-    { href: "/shipments/create", label: "Create Shipment", icon: Ship },
+    { href: "/addresses", label: "Saved Addresses", icon: Ship },
   ],
 };
 
@@ -69,7 +66,7 @@ export const Header = () => {
   const { data: session, status } = useSession();
   const isAuthenticated = status === "authenticated";
 
-  // Handle scroll for shadow effect
+  // Handle scroll for shadow effect and top header visibility
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -90,6 +87,55 @@ export const Header = () => {
         isScrolled ? "shadow-md" : "shadow-none"
       )}
     >
+      {/* Top Header - only visible on large screens */}
+      <div
+        className={cn(
+          "hidden lg:block bg-top-header transition-all duration-300 overflow-hidden",
+          isScrolled ? "opacity-0 h-0" : "opacity-100 h-12"
+        )}
+      >
+        <div className="container mx-auto px-4 h-full">
+          <div className="flex justify-between items-center h-full">
+            {/* Left side */}
+            <div className="flex gap-10">
+              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+                <MapPin className="text-secondary" size={20} />
+                <span>71 Cherry Court Southampton SO53 5PD</span>
+                <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+                <Mail className="text-secondary" size={20} />
+                <span>info@logistex.com</span>
+                <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+                <Clock className="text-secondary" size={20} />
+                <span>Mon - Sat: 8:00 am - 5:00 pm</span>
+              </div>
+            </div>
+            {/* Right side */}
+            <div className="flex items-center gap-10">
+              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+                <Link href={"/help-center"} className="hover:underline">
+                  Help Center
+                </Link>
+                <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+                <Link href={"/find-store"} className="hover:underline">
+                  Find Store
+                </Link>
+                <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+                <span>Follow Us On: </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Logo />
 
@@ -97,9 +143,7 @@ export const Header = () => {
         <nav className="hidden md:flex md:items-center md:space-x-6">
           <ul className="flex space-x-4">
             {mainNavItems.map((item) => {
-              const Icon = item.icon;
               const isActive = pathname === item.href;
-
               return (
                 <li key={item.href}>
                   <Link
@@ -111,23 +155,25 @@ export const Header = () => {
                         : "text-muted-foreground hover:text-secondary"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
-                    {isActive && (
-                      <motion.div
-                        className="absolute bottom-0 left-0 h-0.5 w-full bg-secondary"
-                        layoutId="navbar-indicator"
-                      />
-                    )}
                   </Link>
                 </li>
               );
             })}
           </ul>
-
           <div className="h-6 w-px bg-border" />
+        </nav>
 
-          {isAuthenticated ? (
+        {isAuthenticated ? (
+          <div className="flex items-center gap-3">
+            <Notifications />
+            <Button variant="outline">Active 3</Button>
+            <Link
+              href="/shipments/create"
+              className="bg-secondary text-white font-medium px-3 py-2 rounded-md"
+            >
+              Create Shipment
+            </Link>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
@@ -176,30 +222,26 @@ export const Header = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <div className="flex items-center space-x-2">
-              {authNavItems.unauthenticated.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <Button
-                    key={item.href}
-                    variant={idx === 0 ? "ghost" : "default"}
-                    size="sm"
-                    className={`${
-                      idx === 0 ? "" : "bg-secondary hover:bg-secondary/80"
-                    }`}
-                    asChild
-                  >
-                    <Link href={item.href} className="gap-2">
-                      <Icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </Button>
-                );
-              })}
-            </div>
-          )}
-        </nav>
+          </div>
+        ) : (
+          <div className="hidden lg:flex items-center space-x-2 ">
+            {authNavItems.unauthenticated.map((item, idx) => (
+              <Button
+                key={item.href}
+                variant={idx === 0 ? "ghost" : "default"}
+                size="sm"
+                className={
+                  idx === 0 ? "" : "bg-secondary hover:bg-secondary/80"
+                }
+                asChild
+              >
+                <Link href={item.href} className="gap-2">
+                  <span>{item.label}</span>
+                </Link>
+              </Button>
+            ))}
+          </div>
+        )}
 
         {/* Mobile Navigation */}
         <Sheet>
@@ -221,19 +263,11 @@ export const Header = () => {
                       </Link>
                     </SheetTitle>
                   </SheetHeader>
-                  {/* <SheetClose asChild>
-                    <Button variant="ghost" size="icon">
-                      <X className="h-5 w-5" />
-                      <span className="sr-only">Close</span>
-                    </Button>
-                  </SheetClose> */}
                 </div>
 
                 <nav className="flex flex-col space-y-1">
                   {mainNavItems.map((item) => {
-                    const Icon = item.icon;
                     const isActive = pathname === item.href;
-
                     return (
                       <SheetClose key={item.href} asChild>
                         <Link
@@ -245,7 +279,6 @@ export const Header = () => {
                               : "hover:bg-accent hover:text-accent-foreground"
                           )}
                         >
-                          <Icon className="h-4 w-4" />
                           <span>{item.label}</span>
                         </Link>
                       </SheetClose>
@@ -292,20 +325,16 @@ export const Header = () => {
                     </>
                   ) : (
                     <>
-                      {authNavItems.unauthenticated.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <SheetClose key={item.href} asChild>
-                            <Link
-                              href={item.href}
-                              className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                            >
-                              <Icon className="h-4 w-4" />
-                              <span>{item.label}</span>
-                            </Link>
-                          </SheetClose>
-                        );
-                      })}
+                      {authNavItems.unauthenticated.map((item) => (
+                        <SheetClose key={item.href} asChild>
+                          <Link
+                            href={item.href}
+                            className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <span>{item.label}</span>
+                          </Link>
+                        </SheetClose>
+                      ))}
                     </>
                   )}
                 </nav>

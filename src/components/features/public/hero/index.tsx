@@ -44,7 +44,7 @@ export const Hero = () => {
         {/* right side  */}
         <div className="relative w-full md:w-1/2   md:self-end mx-auto md:mx-0 hidden md:flex justify-center">
           <Image
-            src={"/logos/euroswift-2.jpg"}
+            src={"/images/delivery-man.webp"}
             width={500}
             height={500}
             alt="delivery-man"

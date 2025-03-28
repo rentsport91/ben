@@ -12,7 +12,10 @@ export type FormState = {
   errorMessage?: unknown;
 };
 
-export async function registerAction(formData: FormData): Promise<FormState> {
+export async function registerAction(
+  _previousState: unknown,
+  formData: FormData
+): Promise<FormState> {
   const registerFormData = Object.fromEntries(formData);
   const results = RegisterSchema.safeParse(registerFormData);
 

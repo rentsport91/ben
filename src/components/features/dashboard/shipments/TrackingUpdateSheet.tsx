@@ -114,11 +114,11 @@ export function TrackingUpdateSheet({
             <SelectContent>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="on_hold">On Hold</SelectItem>
-              <SelectItem value="in transit">In Transit</SelectItem>
+              <SelectItem value="in_transit">In Transit</SelectItem>
               <SelectItem value="delivered">Delivered</SelectItem>
               <SelectItem value="returned">Returned</SelectItem>
               <SelectItem value="picked up">Picked Up</SelectItem>
-              <SelectItem value="information received">
+              <SelectItem value="information_received">
                 Information Received
               </SelectItem>
               <SelectItem value="failed">Failed</SelectItem>

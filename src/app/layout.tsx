@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Euroswift Logistics",
+  title: "Logistex Shipping",
   description: "Our Global Shipping Solutions",
   icons: {
     icon: "/favicon.ico",

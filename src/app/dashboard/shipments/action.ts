@@ -20,6 +20,8 @@ const updateTrackingStatusSchema = z.object({
     "delivered",
     "returned",
     "failed",
+    "picked_up",
+    "information_received",
   ]),
 });
 

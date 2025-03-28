@@ -24,7 +24,7 @@ export const Footer = () => {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center space-x-2 mb-5">
               <Image
-                src={"/logos/logo-light.png"}
+                src={"/images/logo.svg"}
                 width={150}
                 height={150}
                 alt="logo"
@@ -37,16 +37,16 @@ export const Footer = () => {
             <div className="space-y-4">
               <div className="flex items-center">
                 <Phone size={18} className="text-shipping-600 mr-3" />
-                <span className="text-gray-700">+233 540977983</span>
+                <span className="text-gray-700">+44 7349 381036</span>
               </div>
               <div className="flex items-center">
                 <Mail size={18} className="text-shipping-600 mr-3" />
-                <span className="text-gray-700">info@euroswifts.com</span>
+                <span className="text-gray-700">info@logistex.com</span>
               </div>
               <div className="flex items-start">
                 <MapPin size={18} className="text-shipping-600 mr-3 mt-1" />
                 <span className="text-gray-700">
-                  Off Starlet 91 <br /> Road Ministries Accra
+                  71 Cherry Court Southampton SO53 5PD{" "}
                 </span>
               </div>
             </div>
@@ -224,7 +224,7 @@ export const Footer = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} Euroswift. All rights reserved.
+            &copy; {new Date().getFullYear()} Logistex. All rights reserved.
           </p>
           <div className="flex flex-wrap justify-center space-x-4 text-sm">
             <Link

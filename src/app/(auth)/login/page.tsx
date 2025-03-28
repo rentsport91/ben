@@ -4,7 +4,7 @@ import { auth } from "~/auth";
 import Image from "next/image";
 import { MotionDiv } from "@/components/motion.div";
 import { redirect } from "next/navigation";
-import ClientAuthWrapper from "./client.auth.wrapper";
+import { LoginForm } from "@/components/features/auth/login.form";
 
 const LoginPage = async () => {
   const session = await auth();
@@ -22,8 +22,8 @@ const LoginPage = async () => {
           <div>
             <div className="mb-8">
               <Image
-                src="/logos/logo-dark.png"
-                alt="EuroSwift Logo"
+                src="/images/logo.svg"
+                alt="Logistex Logo"
                 width={150}
                 height={50}
                 className="mb-6"
@@ -60,7 +60,7 @@ const LoginPage = async () => {
           </div>
 
           <div className="text-sm text-gray-300">
-            <p>&copy; 2025 EuroSwift Shipping. All rights reserved.</p>
+            <p>&copy; 2019 Logistex Shipping. All rights reserved.</p>
           </div>
         </MotionDiv>
 
@@ -82,7 +82,7 @@ const LoginPage = async () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <ClientAuthWrapper />
+              <LoginForm />
             </MotionDiv>
           </AnimatePresence>
         </div>

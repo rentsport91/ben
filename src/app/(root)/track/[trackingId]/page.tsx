@@ -20,6 +20,13 @@ async function getTrackingData(trackingNumber: string) {
       destinationPostalCode: true,
       destinationCountry: true,
       serviceType: true,
+      recipient: true,
+      Sender: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
       TrackingUpdates: {
         select: {
           id: true,
@@ -27,6 +34,15 @@ async function getTrackingData(trackingNumber: string) {
           message: true,
           status: true,
           timestamp: true,
+        },
+      },
+      packages: {
+        select: {
+          height: true,
+          length: true,
+          width: true,
+          packageType: true,
+          declaredValue: true,
         },
       },
       createdAt: true,

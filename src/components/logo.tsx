@@ -11,7 +11,7 @@ export const Logo = () => (
   >
     <Link href="/">
       <Image
-        src="/logos/logo-light.png"
+        src="/images/logo.svg"
         alt="site logo"
         width={120}
         height={150}

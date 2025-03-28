@@ -16,7 +16,7 @@ export const Choice = () => {
             </p>
             <p className="w-full md:w-5/6 lg:w-3/4 text-sm md:text-base">
               We Are Logistics Improving Our Skills To Fulfill Delivery Of Any
-              Level! EuroSwift delivers shipments efficiently and securely.
+              Level! Logistex delivers shipments efficiently and securely.
             </p>
             <div className="grid gap-2 pt-2 md:pt-4">
               <div className="flex items-center justify-between">
@@ -37,7 +37,7 @@ export const Choice = () => {
           </div>
           <div className="w-full lg:w-1/2 relative mt-8 lg:mt-0 flex justify-center lg:block">
             <Image
-              src={"/logos/euroswift-1.jpg"}
+              src={"/images/container.webp"}
               alt="container"
               width={400}
               height={400}

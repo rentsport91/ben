@@ -1,4 +1,5 @@
 import { Globe, MapPin } from "lucide-react";
+import Image from "next/image";
 
 export const GlobalNetwork = () => {
   return (
@@ -62,9 +63,11 @@ export const GlobalNetwork = () => {
               {/* Animated World Map */}
               <div className="relative">
                 <div className="absolute -top-10 -left-10 -right-10 -bottom-10 bg-dots-pattern opacity-10 animate-pulse-slow"></div>
-                <img
+                <Image
                   src={"/images/map.png"}
                   alt="Global shipping network"
+                  width={200}
+                  height={200}
                   className="w-full h-auto max-w-lg mx-auto lg:ml-auto animate-float"
                 />
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-md max-h-md">

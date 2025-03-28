@@ -59,31 +59,6 @@ export type Shipment = {
   TrackingUpdates?: TrackingUpdate[];
 };
 
-// Sample data (replace with your fetched data from Prisma)
-// const data: Shipment[] = [
-//   {
-//     id: "shipment1",
-//     trackingNumber: "TN123456",
-//     originCity: "New York",
-//     destinationCity: "Los Angeles",
-//     serviceType: "Express",
-//     estimatedDelivery: "2025-04-01T00:00:00Z",
-//     isPaid: true,
-//     createdAt: "2025-03-20T00:00:00Z",
-//   },
-//   {
-//     id: "shipment2",
-//     trackingNumber: "TN654321",
-//     originCity: "Chicago",
-//     destinationCity: "Houston",
-//     serviceType: "Standard",
-//     estimatedDelivery: "2025-04-05T00:00:00Z",
-//     isPaid: false,
-//     createdAt: "2025-03-22T00:00:00Z",
-//   },
-//   // Add more shipments as needed.
-// ];
-
 export const columns: ColumnDef<Shipment>[] = [
   {
     id: "select",
@@ -193,8 +168,13 @@ export const columns: ColumnDef<Shipment>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/tract/result?id=${shipment.trackingNumber}`}>
+              <Link href={`/track/results?id=${shipment.trackingNumber}`}>
                 Track Shipment
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/dashboard/shipments/${shipment.id}/detail`}>
+                Update Shipment Status
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>View Details</DropdownMenuItem>
@@ -301,7 +281,6 @@ export function ShipmentsDataTable({ data }: { data: Shipment[] }) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => setSelectedShipment(row.original)}
                   className="cursor-pointer hover:bg-muted"
                 >
                   {row.getVisibleCells().map((cell) => (

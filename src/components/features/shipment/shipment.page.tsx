@@ -148,12 +148,10 @@ export const ShipmentsPage = ({ shipments }: { shipments: Shipment[] }) => {
   };
 
   const handleDownloadReceipt = (
-    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
-    shipment: Shipment
+    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>
   ) => {
     e.stopPropagation();
     // Implement download receipt functionality
-    console.log("Downloading receipt for", shipment.id);
     // This would typically call an API endpoint or use a PDF generation library
   };
 
@@ -345,7 +343,7 @@ export const ShipmentsPage = ({ shipments }: { shipments: Shipment[] }) => {
                             View Details
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={(e) => handleDownloadReceipt(e, shipment)}
+                            onClick={(e) => handleDownloadReceipt(e)}
                           >
                             <Download className="mr-2 h-4 w-4" />
                             Download Receipt

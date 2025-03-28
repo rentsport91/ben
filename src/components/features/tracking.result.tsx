@@ -12,6 +12,23 @@ interface TrackingEvent {
   message: string;
 }
 
+interface Sender {
+  name: string;
+  email: string;
+}
+
+interface Package {
+  height: number;
+  width: number;
+  length: number;
+  package: string;
+  declaredValue: number | null;
+}
+
+interface Recipient {
+  name: string;
+}
+
 interface TrackingData {
   trackingNumber: string;
   estimatedDelivery: Date;
@@ -28,6 +45,9 @@ interface TrackingData {
   serviceType: string;
   TrackingUpdates: TrackingEvent[];
   createdAt: Date;
+  Sender: Sender;
+  recipient: Recipient;
+  packages: Package;
 }
 
 type TrackingResultProps = {
@@ -38,6 +58,8 @@ export default function TrackingResult({ data }: TrackingResultProps) {
   const [activeTab, setActiveTab] = useState<"timeline" | "details">(
     "timeline"
   );
+
+  console.log(data.packages);
 
   const formatDate = (input: string | Date): string => {
     try {
@@ -212,6 +234,23 @@ export default function TrackingResult({ data }: TrackingResultProps) {
             <dl>
               <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt className="text-sm font-medium text-gray-500">
+                  Origin Name
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {data.Sender.name}
+                </dd>
+              </div>
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">
+                  Recipient Name
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {data.recipient.name}
+                </dd>
+              </div>
+
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">
                   Origin Address
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -234,6 +273,33 @@ export default function TrackingResult({ data }: TrackingResultProps) {
                   {data.serviceType}
                 </dd>
               </div>
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">
+                  Package Type
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {data.packages.package}
+                </dd>
+              </div>
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">
+                  Package Dimension (H * L * W)
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {data.packages[0].height *
+                    data.packages[0].length *
+                    data.packages[0].width}{" "}
+                  cm
+                </dd>
+              </div>
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">
+                  Declared Value
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  $ {data.packages[0].declaredValue}
+                </dd>
+              </div>
               {/* Additional shipment details can be added here */}
             </dl>
           </div>
@@ -247,15 +313,15 @@ function getStatusColor(status: string | null): string {
   switch (status?.toLowerCase()) {
     case "delivered":
       return "bg-green-200 text-green-800";
-    case "in transit":
+    case "in_transit":
       return "bg-blue-200 text-blue-800";
     case "arrived":
       return "bg-purple-200 text-purple-800";
     case "departed":
       return "bg-indigo-200 text-indigo-800";
-    case "picked up":
+    case "picked_up":
       return "bg-yellow-200 text-yellow-800";
-    case "information received":
+    case "information_received":
       return "bg-gray-200 text-gray-800";
     case "failed":
       return "bg-red-200 text-red-800";

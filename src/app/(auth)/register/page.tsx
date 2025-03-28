@@ -23,8 +23,8 @@ const RegisterPage = async () => {
           <div>
             <div className="mb-8">
               <Image
-                src="/logos/logo-dark.png"
-                alt="EuroSwift Logo"
+                src="/images/logo.svg"
+                alt="logistex Logo"
                 width={150}
                 height={50}
                 className="mb-6"
@@ -61,7 +61,7 @@ const RegisterPage = async () => {
           </div>
 
           <div className="text-sm text-gray-300">
-            <p>&copy; 2025 EuroSwift Shipping. All rights reserved.</p>
+            <p>&copy; 2019 Logistex Shipping. All rights reserved.</p>
           </div>
         </MotionDiv>
 

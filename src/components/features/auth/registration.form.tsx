@@ -8,8 +8,8 @@ import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 import { motion } from "motion/react";
 
 import Link from "next/link";
-import { useState } from "react";
-import { registerAction } from "@/app/(auth)/_register/action";
+import { useActionState, useState } from "react";
+import { registerAction } from "@/app/(auth)/register/action";
 import {
   Form,
   FormControl,
@@ -22,13 +22,14 @@ import { useForm } from "react-hook-form";
 import {
   RegisterProps,
   RegisterSchema,
-} from "@/app/(auth)/_register/_definitions/schema";
+} from "@/app/(auth)/register/_definitions/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, action, isPending] = useActionState(registerAction, null);
   const router = useRouter();
   const form = useForm<RegisterProps>({
     resolver: zodResolver(RegisterSchema),
@@ -54,14 +55,14 @@ export const RegistrationForm = () => {
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("password", password);
-    const results = await registerAction(formData);
+    await action(formData);
 
-    if (!results.success) {
-      toast.warning(results.message);
+    if (!error?.success) {
+      toast.warning(error?.message);
       return;
     }
 
-    toast.success(results.message);
+    toast.success(error.message);
     form.reset();
     router.push("/login");
   };
@@ -202,9 +203,9 @@ export const RegistrationForm = () => {
           <Button
             type="submit"
             className="w-full bg-secondary hover:bg-secondary hover:opacity-80 text-white py-2 h-11 mt-2"
-            disabled={form.formState.isSubmitting}
+            disabled={isPending}
           >
-            {form.formState.isSubmitting ? (
+            {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating account...
