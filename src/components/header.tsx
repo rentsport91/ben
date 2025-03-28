@@ -69,7 +69,7 @@ export const Header = () => {
   // Handle scroll for shadow effect and top header visibility
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
