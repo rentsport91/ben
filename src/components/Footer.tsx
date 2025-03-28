@@ -1,16 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import {
-  Mail,
-  ArrowRight,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Instagram,
-  Youtube,
-  Phone,
-  MapPin,
-} from "lucide-react";
+import { Mail, ArrowRight, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -178,44 +168,6 @@ export const Footer = () => {
                   Privacy Policy
                 </Link>
               </p>
-            </div>
-
-            <div className="mt-8">
-              <h3 className="font-display font-medium text-lg mb-4">
-                Follow Us
-              </h3>
-              <div className="flex space-x-4">
-                <a
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-gray-100 hover:bg-shipping-50 flex items-center justify-center text-gray-600 hover:text-shipping-600 transition-colors"
-                >
-                  <Facebook size={18} />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-gray-100 hover:bg-shipping-50 flex items-center justify-center text-gray-600 hover:text-shipping-600 transition-colors"
-                >
-                  <Twitter size={18} />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-gray-100 hover:bg-shipping-50 flex items-center justify-center text-gray-600 hover:text-shipping-600 transition-colors"
-                >
-                  <Linkedin size={18} />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-gray-100 hover:bg-shipping-50 flex items-center justify-center text-gray-600 hover:text-shipping-600 transition-colors"
-                >
-                  <Instagram size={18} />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-gray-100 hover:bg-shipping-50 flex items-center justify-center text-gray-600 hover:text-shipping-600 transition-colors"
-                >
-                  <Youtube size={18} />
-                </a>
-              </div>
             </div>
           </div>
         </div>
