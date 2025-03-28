@@ -48,28 +48,28 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/about"
+                  href="/ship"
                   className="text-gray-600 hover:text-shipping-600 transition-colors"
                 >
-                  About Us
-                </Link>
-              </li>
-              {/* <li>
-                <Link
-                  href="/careers"
-                  className="text-gray-600 hover:text-shipping-600 transition-colors"
-                >
-                  Careers
+                  Ship{" "}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/news"
+                  href="/track"
                   className="text-gray-600 hover:text-shipping-600 transition-colors"
                 >
-                  News & Updates
+                  Track Shipment
                 </Link>
-              </li> */}
+              </li>
+              <li>
+                <Link
+                  href="/services"
+                  className="text-gray-600 hover:text-shipping-600 transition-colors"
+                >
+                  Services
+                </Link>
+              </li>
               {/* <li>
                 <Link
                   href="/sustainability"
@@ -119,7 +119,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/customs"
+                  href="/support"
                   className="text-gray-600 hover:text-shipping-600 transition-colors"
                 >
                   Customs Support
@@ -127,7 +127,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/business"
+                  href="/"
                   className="text-gray-600 hover:text-shipping-600 transition-colors"
                 >
                   Business Shipping
@@ -162,7 +162,7 @@ export const Footer = () => {
               <p className="text-xs text-gray-500">
                 By subscribing, you agree to our
                 <Link
-                  href="/privacy"
+                  href="/"
                   className="text-shipping-600 hover:underline ml-1"
                 >
                   Privacy Policy
@@ -180,27 +180,24 @@ export const Footer = () => {
           </p>
           <div className="flex flex-wrap justify-center space-x-4 text-sm">
             <Link
-              href="/terms"
+              href="/"
               className="text-gray-500 hover:text-shipping-600 mb-2 md:mb-0"
             >
               Terms of Service
             </Link>
             <Link
-              href="/privacy"
+              href="/"
               className="text-gray-500 hover:text-shipping-600 mb-2 md:mb-0"
             >
               Privacy Policy
             </Link>
             <Link
-              href="/cookies"
+              href="/"
               className="text-gray-500 hover:text-shipping-600 mb-2 md:mb-0"
             >
               Cookie Policy
             </Link>
-            <Link
-              href="/legal"
-              className="text-gray-500 hover:text-shipping-600"
-            >
+            <Link href="/" className="text-gray-500 hover:text-shipping-600">
               Legal
             </Link>
           </div>
