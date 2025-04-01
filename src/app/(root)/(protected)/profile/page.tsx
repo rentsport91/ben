@@ -1,11 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { UserCircle, Bell, Shield } from "lucide-react";
+import { UserCircle, Shield } from "lucide-react";
 import { prisma } from "@/constants/config/db";
 import { auth } from "~/auth";
 
 import ProfileForm from "@/components/features/auth/profile.form";
-// import NotificationForm from "@/components/features/auth/notification.form";
 import SecurityForm from "@/components/features/auth/security.form";
 
 export default async function ProfilePage() {
@@ -56,15 +55,12 @@ export default async function ProfilePage() {
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile" className="flex items-center">
-            <UserCircle className="mr-2 h-4 w-4" />
+            <UserCircle className="mr-2 h-4 w-4 text-secondary" />
             Profile
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center">
-            <Bell className="mr-2 h-4 w-4" />
-            Notifications
-          </TabsTrigger>
+
           <TabsTrigger value="security" className="flex items-center">
-            <Shield className="mr-2 h-4 w-4" />
+            <Shield className="mr-2 h-4 w-4 text-secondary" />
             Security
           </TabsTrigger>
         </TabsList>
@@ -73,14 +69,6 @@ export default async function ProfilePage() {
           <Card>
             <CardContent className="pt-6">
               <ProfileForm userData={userData} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <Card>
-            <CardContent className="pt-6">
-              {/* <NotificationForm userData={userData} /> */}
             </CardContent>
           </Card>
         </TabsContent>
