@@ -6,12 +6,13 @@ import { auth } from "~/auth";
 
 import ProfileForm from "@/components/features/auth/profile.form";
 import SecurityForm from "@/components/features/auth/security.form";
+import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
   const session = await auth();
 
   if (!session || !session.user) {
-    return null;
+    return redirect("/");
   }
   const userData = await prisma.profile.findUnique({
     where: {
