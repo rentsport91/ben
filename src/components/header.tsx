@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
-  Ship,
+  // Ship,
   Menu,
   User,
   Package,
@@ -57,7 +57,7 @@ const authNavItems = {
   authenticated: [
     { href: "/profile", label: "Profile", icon: User },
     { href: "/shipments/history", label: "My Shipments", icon: Package },
-    { href: "/addresses", label: "Saved Addresses", icon: Ship },
+    // { href: "/addresses", label: "Saved Addresses", icon: Ship },
   ],
 };
 
@@ -99,38 +99,40 @@ export const Header = () => {
           <div className="flex justify-between items-center h-full">
             {/* Left side */}
             <div className="flex gap-10">
-              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+              <div className="flex items-center gap-2 text-gray-300 relative">
                 <MapPin className="text-secondary" size={20} />
-                <span>71 Cherry Court Southampton SO53 5PD</span>
+                <span className="text-xs">
+                  71 Cherry Court Southampton SO53 5PD
+                </span>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
                 <Mail className="text-secondary" size={20} />
-                <span>info@logistex.com</span>
+                <span className="text-xs">info@logistex.com</span>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
                 <Clock className="text-secondary" size={20} />
-                <span>Mon - Sat: 8:00 am - 5:00 pm</span>
+                <span className="text-xs">Mon - Sat: 8:00 am - 5:00 pm</span>
               </div>
             </div>
             {/* Right side */}
             <div className="flex items-center gap-10">
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
-                <Link href={"/support"} className="hover:underline">
+                <Link href={"/support"} className="hover:underline text-xs">
                   Help Center
                 </Link>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
-                <Link href={"/"} className="hover:underline">
+                <Link href={"/"} className="hover:underline text-xs">
                   Find Store
                 </Link>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
-              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
+              {/* <div className="flex items-center gap-2 text-gray-300 text-sm relative text-sm">
                 <span>Follow Us On: </span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
