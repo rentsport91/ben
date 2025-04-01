@@ -1,5 +1,3 @@
-"use client";
-
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/constants/config/db";
 import { Button } from "@/components/ui/button";
@@ -12,11 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useActionState } from "react";
-import { Loader2 } from "lucide-react";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function addTrackingUpdate(prevState: any, formData: FormData) {
+export async function addTrackingUpdate(formData: FormData) {
   "use server";
   const shipmentId = formData.get("shipmentId") as string;
   const status = formData.get("status") as string;
@@ -24,10 +19,7 @@ export async function addTrackingUpdate(prevState: any, formData: FormData) {
   const location = formData.get("location") as string;
 
   if (!status || !message) {
-    return {
-      success: false,
-      message: "All fields are required",
-    };
+    throw new Error("Status and message are required.");
   }
 
   await prisma.trackingUpdate.create({
@@ -47,14 +39,13 @@ interface TrackingUpdateFormProps {
   shipmentId: string;
 }
 
-export const TrackingUpdateForm = ({ shipmentId }: TrackingUpdateFormProps) => {
-  const [state, action, isPending] = useActionState(addTrackingUpdate, null);
+export const TrackingUpdateForm = async ({
+  shipmentId,
+}: TrackingUpdateFormProps) => {
   return (
-    <form action={action} method="POST" className="space-y-4">
+    <form action={addTrackingUpdate} method="POST" className="space-y-4">
       <input type="hidden" name="shipmentId" value={shipmentId} />
-      <p className="p-2 bg-rose-200 text-rose-600 rounded-md">
-        {!state?.success && state?.message}
-      </p>
+
       <div className="flex flex-col gap-2">
         <Label htmlFor="status">Status</Label>
         <Select name="status" required>
@@ -93,16 +84,8 @@ export const TrackingUpdateForm = ({ shipmentId }: TrackingUpdateFormProps) => {
           placeholder="Enter location"
         />
       </div>
-      <Button
-        type="submit"
-        className="bg-secondary hover:bg-secondary/80"
-        disabled={isPending}
-      >
-        {isPending ? (
-          <Loader2 className="animate-spin repeat-infinite" />
-        ) : (
-          "Submit Update"
-        )}
+      <Button type="submit" className="bg-secondary hover:bg-secondary/80">
+        Submit Update
       </Button>
     </form>
   );
