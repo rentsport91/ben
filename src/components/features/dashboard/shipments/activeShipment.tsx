@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 export const ActiveShipment = () => {
   const [count, setCount] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchShipmentCount() {
@@ -19,7 +19,11 @@ export const ActiveShipment = () => {
         const data = await res.json();
         setCount(data);
       } catch (err) {
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       }
     }
 
