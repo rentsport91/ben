@@ -1,8 +1,9 @@
 // app/shipment/[id]/page.tsx
 import { prisma } from "@/constants/config/db";
 import { format } from "date-fns";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { TrackingUpdateForm } from "./UpdateTrackingForm";
+import { auth } from "~/auth";
 
 export default async function ShipmentDetailPage({
   params,
@@ -10,6 +11,11 @@ export default async function ShipmentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  const session = await auth();
+  if (session?.user.role !== "ADMIN") {
+    return redirect("/login");
+  }
 
   // Fetch the shipment along with related data
   const shipment = await prisma.shipment.findUnique({

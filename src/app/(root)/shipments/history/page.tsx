@@ -17,7 +17,7 @@ export default async function ShipmentsRoute() {
   const session = await auth();
 
   if (!session) {
-    redirect("/auth/login");
+    redirect("/login");
   }
 
   // Get shipments from database

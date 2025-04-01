@@ -1,7 +1,9 @@
 "use server";
 
 import { prisma } from "@/constants/config/db"; // Adjust the import based on your Prisma client location
+import { redirect } from "next/navigation";
 import { z } from "zod";
+import { auth } from "~/auth";
 
 // Define the expected schema for the form data, with a preprocessor for trackingUpdateId.
 const updateTrackingStatusSchema = z.object({
@@ -26,6 +28,11 @@ const updateTrackingStatusSchema = z.object({
 });
 
 export async function updateTrackingStatus(formData: FormData) {
+  const session = await auth();
+  if (session?.user.role !== "ADMIN") {
+    return redirect("/login");
+  }
+
   // Extract form values into an object
   const rawData = {
     shipmentId: formData.get("shipmentId"),
