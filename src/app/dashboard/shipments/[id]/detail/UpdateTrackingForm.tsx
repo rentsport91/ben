@@ -1,4 +1,5 @@
-// app/shipment/[id]/TrackingUpdateForm.server.tsx
+"use client";
+
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/constants/config/db";
 import { Button } from "@/components/ui/button";
