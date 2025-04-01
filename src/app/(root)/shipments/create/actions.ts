@@ -138,4 +138,6 @@ export async function createShipment(formData: FormData) {
       error: "Failed to create shipment. Please try again.",
     };
   }
+
+  revalidatePath("/shipments");
 }

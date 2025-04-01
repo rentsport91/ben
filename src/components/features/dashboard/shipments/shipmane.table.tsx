@@ -162,7 +162,9 @@ export const columns: ColumnDef<Shipment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(shipment.id)}
+              onClick={() =>
+                navigator.clipboard.writeText(shipment.trackingNumber!)
+              }
             >
               Copy shipment ID
             </DropdownMenuItem>
@@ -177,7 +179,11 @@ export const columns: ColumnDef<Shipment>[] = [
                 Update Shipment Status
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>View Details</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/dashboard/shipments/${shipment.id}/detail`}>
+                View Details
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
