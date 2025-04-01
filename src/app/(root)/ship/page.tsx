@@ -381,7 +381,7 @@ function GetQuotePage() {
         <p className="text-sm font-medium mb-2">Need Immediate Assistance?</p>
         <div className="flex justify-center gap-2">
           <Button variant="outline" size="sm" className="cursor-pointer">
-            <Phone className="mr-2 h-4 w-4" /> Call Us
+            <Phone className="mr-2 h-4 w-4" /> WhatsApp Us
           </Button>
           <Button
             variant="default"
