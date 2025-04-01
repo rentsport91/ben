@@ -11,8 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useActionState } from "react";
+import { Loader2 } from "lucide-react";
 
-export async function addTrackingUpdate(formData: FormData) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function addTrackingUpdate(prevState: any, formData: FormData) {
   "use server";
   const shipmentId = formData.get("shipmentId") as string;
   const status = formData.get("status") as string;
@@ -20,7 +23,10 @@ export async function addTrackingUpdate(formData: FormData) {
   const location = formData.get("location") as string;
 
   if (!status || !message) {
-    throw new Error("Status and message are required.");
+    return {
+      success: false,
+      message: "All fields are required",
+    };
   }
 
   await prisma.trackingUpdate.create({
@@ -41,9 +47,13 @@ interface TrackingUpdateFormProps {
 }
 
 export const TrackingUpdateForm = ({ shipmentId }: TrackingUpdateFormProps) => {
+  const [state, action, isPending] = useActionState(addTrackingUpdate, null);
   return (
-    <form action={addTrackingUpdate} method="POST" className="space-y-4">
+    <form action={action} method="POST" className="space-y-4">
       <input type="hidden" name="shipmentId" value={shipmentId} />
+      <p className="p-2 bg-rose-200 text-rose-600 rounded-md">
+        {!state?.success && state?.message}
+      </p>
       <div className="flex flex-col gap-2">
         <Label htmlFor="status">Status</Label>
         <Select name="status" required>
@@ -82,7 +92,17 @@ export const TrackingUpdateForm = ({ shipmentId }: TrackingUpdateFormProps) => {
           placeholder="Enter location"
         />
       </div>
-      <Button type="submit">Submit Update</Button>
+      <Button
+        type="submit"
+        className="bg-secondary hover:bg-secondary/80"
+        disabled={isPending}
+      >
+        {isPending ? (
+          <Loader2 className="animate-spin repeat-infinite" />
+        ) : (
+          "Submit Update"
+        )}
+      </Button>
     </form>
   );
 };
