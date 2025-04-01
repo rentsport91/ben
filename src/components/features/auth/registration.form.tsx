@@ -55,7 +55,7 @@ export const RegistrationForm = () => {
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("password", password);
-    await action(formData);
+    action(formData);
 
     if (!error?.success) {
       toast.warning(error?.message);
@@ -154,29 +154,35 @@ export const RegistrationForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>
+                    <Label htmlFor="login-password">Password</Label>
+                  </FormLabel>
+
                   <FormControl>
-                    <Input
-                      id="register-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create a secure password"
-                      className="pr-10"
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        className="pr-10"
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="relative">
-              <button
-                type="button"
-                className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
             <p className="text-xs text-gray-500 mt-1">
               Password must be at least 8 characters with a number and special
               character

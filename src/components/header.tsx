@@ -38,6 +38,7 @@ import {
 import { signOut } from "next-auth/react";
 import { Logo } from "./logo";
 import { Notifications } from "./features/notification/notification";
+import { ActiveShipment } from "./features/dashboard/shipments/activeShipment";
 
 // Navigation items definition
 const mainNavItems = [
@@ -167,7 +168,7 @@ export const Header = () => {
         {isAuthenticated ? (
           <div className="hidden lg:flex items-center gap-3 ">
             <Notifications />
-            <Button variant="outline">Active 3</Button>
+            <ActiveShipment />
             <Link
               href="/shipments/create"
               className="bg-secondary text-white font-medium px-3 py-2 rounded-md"
@@ -318,7 +319,7 @@ export const Header = () => {
                         </p>
                       </div>
                       <Notifications />
-                      <Button variant="outline">Active 3</Button>
+                      <ActiveShipment />
                       <Link
                         href="/shipments/create"
                         className="bg-secondary text-white font-medium px-3 py-2 rounded-md"

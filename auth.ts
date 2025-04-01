@@ -43,12 +43,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          if (!user.isVerified) {
-            throw new Error(
-              "Please verify your email address before logging in."
-            );
-          }
-
           // Await bcrypt.compare to correctly check password
           const match = await bcrypt.compare(password, user.password);
           if (!match) {
