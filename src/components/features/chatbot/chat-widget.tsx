@@ -340,7 +340,7 @@ export default function ChatWidget() {
               </div>
 
               {/* Message input */}
-              <div className="border-t">
+              <div className="border-t px-2">
                 <form onSubmit={sendMessage} className="flex items-center p-3">
                   <button
                     type="button"
