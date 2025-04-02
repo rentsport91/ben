@@ -25,7 +25,7 @@ export const Footer = () => {
               individuals worldwide. Fast, secure delivery you can count on.
             </p>
             <div className="space-y-4">
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <Image
                   src="/images/whatsapp.png"
                   width={18}
@@ -34,7 +34,7 @@ export const Footer = () => {
                   className="mr-2"
                 />
                 <span className="text-gray-700">+44 7349 381036</span>
-              </div>
+              </div> */}
               <div className="flex items-center">
                 <Mail size={18} className="text-shipping-600 mr-3" />
                 <span className="text-gray-700">info@logistex.com</span>

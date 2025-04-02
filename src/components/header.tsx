@@ -108,7 +108,7 @@ export const Header = () => {
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
                 <Mail className="text-secondary" size={20} />
-                <span className="text-xs">info@logistex.com</span>
+                <span className="text-xs">admin@logistex.org</span>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
@@ -277,7 +277,7 @@ export const Header = () => {
                       </div>
                       <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
                         <Mail className="text-secondary" size={20} />
-                        <span>info@logistex.com</span>
+                        <span>admin@logistex.org</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
                         <Clock className="text-secondary" size={20} />

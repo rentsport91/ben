@@ -51,18 +51,24 @@ const PACKAGE_TYPES = [
 ];
 
 // Shipping options
-const SHIPPING_OPTIONS = [
-  {
-    id: "express",
-    label: "Express Delivery",
-    description: "1-2 business days",
-    price: 49.99,
-  },
+export const SHIPPING_OPTIONS = [
   {
     id: "standard",
     label: "Standard Delivery",
+    description: "20-30 business days",
+    price: 19.99, // Cheapest slowest option
+  },
+  {
+    id: "economy",
+    label: "Economy Delivery",
+    description: "10-15 business days",
+    price: 39.99, // Mid-tier price
+  },
+  {
+    id: "express",
+    label: "Express Delivery",
     description: "3-5 business days",
-    price: 19.99,
+    price: 59.99, // Most expensive fastest option
   },
 ];
 
@@ -162,7 +168,15 @@ export default function CreateShipmentPage() {
     const packages = form.watch("packages");
     const serviceType = form.watch("serviceType");
 
-    const shippingCost = serviceType === "express" ? 79.98 : 19.99;
+    // Find selected shipping option
+    const selectedShipping = SHIPPING_OPTIONS.find(
+      (option) => option.id === serviceType.toLowerCase()
+    );
+
+    // Default to standard if not found
+    const shippingCost = selectedShipping?.price ?? 89.99;
+    const shippingLabel = selectedShipping?.label ?? "Standard Delivery";
+
     const insuranceCost = 10.0;
     const taxAmount = 13.5;
 
@@ -178,8 +192,7 @@ export default function CreateShipmentPage() {
 
     return {
       packages: packageSummary,
-      shippingMethod:
-        serviceType === "express" ? "Express Delivery" : "Standard Delivery",
+      shippingMethod: shippingLabel,
       shippingCost: `$${shippingCost.toFixed(2)}`,
       insuranceCost: `$${insuranceCost.toFixed(2)}`,
       tax: `$${taxAmount.toFixed(2)}`,

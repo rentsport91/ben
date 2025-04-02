@@ -1,5 +1,6 @@
 // app/lib/schemas.ts
 import { z } from "zod";
+import { SHIPPING_OPTIONS } from "../app/(root)/shipments/create/page";
 
 // Package schema
 export const packageSchema = z.object({
@@ -20,6 +21,11 @@ export const packageSchema = z.object({
   insurance: z.boolean().default(false),
 });
 
+export const SERVICE_TYPE_IDS = SHIPPING_OPTIONS.map((option) => option.id);
+const SERVICE_TYPES = SHIPPING_OPTIONS.map((option) => option.id) as [
+  string,
+  ...string[]
+];
 // Main shipment schema
 export const shipmentSchema = z.object({
   // Origin address
@@ -37,7 +43,9 @@ export const shipmentSchema = z.object({
     .string()
     .min(1, "Destination postal code is required"),
   destinationCountry: z.string().min(1, "Destination country is required"),
-  serviceType: z.string().min(1, "Service type is required"),
+  // Updated service type with enum validation
+  serviceType: z.enum(SERVICE_TYPES),
+
   packages: z.array(packageSchema).min(1, "At least one package is required"),
 
   specialInstructions: z.string().optional(),

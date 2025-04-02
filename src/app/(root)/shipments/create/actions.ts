@@ -10,23 +10,24 @@ import { auth } from "~/auth";
 // Helper function to generate a tracking number
 function generateTrackingNumber(): string {
   // Example: Generate a random alphanumeric string prefixed with 'TRK-'
-  return "EUS-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+  return "LOX-" + Math.random().toString(36).substring(2, 10).toUpperCase();
 }
 
 // Helper function to calculate estimated delivery based on serviceType
 function calculateEstimatedDelivery(serviceType: string): Date {
   const now = new Date();
-  let daysToAdd = 5; // default for "standard"
+  let daysToAdd = 10; // default for "standard"
   switch (serviceType.toLowerCase()) {
     case "express":
-      daysToAdd = 2;
-      break;
-    case "economy":
       daysToAdd = 10;
       break;
+    case "economy":
+      daysToAdd = 20;
+      break;
     case "standard":
+      daysToAdd = 40;
     default:
-      daysToAdd = 5;
+      daysToAdd = 30;
       break;
   }
   now.setDate(now.getDate() + daysToAdd);
