@@ -91,42 +91,6 @@ export default function SupportPage() {
     }
   };
 
-  // Support Contact Channels
-  const supportChannels = [
-    {
-      image: (
-        <Image
-          src="/images/whatsapp.png"
-          width={50}
-          height={50}
-          alt="whatsApp logo"
-          className="mr-2"
-        />
-      ),
-      title: "WhatsApp Support",
-      description: "Chat directly with our logistics experts",
-      details: "+44 7349 38103",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      icon: Mail,
-      title: "Email Support",
-      description: "Quick and convenient communication",
-      details: "support@logistex.com",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      icon: MessageCircle,
-      title: "Live Chat",
-      description: "Instant support during business hours",
-      details: "Available 9 AM - 6 PM EST",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-  ];
-
   return (
     <div className="container mx-auto px-4 py-12 overflow-hidden">
       {/* Animated Hero Section */}
@@ -155,43 +119,7 @@ export default function SupportPage() {
           staggerChildren: 0.2,
         }}
         className="grid md:grid-cols-3 gap-6 mb-16"
-      >
-        {supportChannels.map((channel, index) => (
-          <motion.div
-            key={channel.title}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20,
-            }}
-          >
-            <Card
-              className={`hover:shadow-xl transition-all duration-300 ${channel.bgColor}`}
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  {channel.icon ? (
-                    <channel.icon className={`h-12 w-12 ${channel.color}`} />
-                  ) : (
-                    channel.image
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <h3 className="text-xl font-semibold mb-2 text-gray-800">
-                  {channel.title}
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  {channel.description}
-                </p>
-                <p className="font-medium text-gray-700">{channel.details}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </motion.div>
+      ></motion.div>
 
       {/* Animated Support Request Form */}
       <motion.div

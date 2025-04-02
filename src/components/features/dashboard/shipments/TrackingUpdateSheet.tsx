@@ -18,6 +18,18 @@ import {
 } from "@/components/ui/select";
 import { updateTrackingStatus } from "@/app/dashboard/shipments/action";
 import type { Shipment } from "./shipmane.table"; // adjust the path as needed
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface TrackingUpdateSheetProps {
   shipment: Shipment;
@@ -25,36 +37,58 @@ interface TrackingUpdateSheetProps {
   onClose?: () => void;
 }
 
+// Define validation schema
+const trackingUpdateSchema = z.object({
+  location: z.string().min(1, "Location is required"),
+  message: z.string().min(1, "Message is required"),
+  status: z.enum([
+    "pending",
+    "on_hold",
+    "in_transit",
+    "delivered",
+    "returned",
+    "picked_up",
+    "information_received",
+    "failed",
+    "arrived",
+    "departed",
+  ]),
+});
+
+type FormValues = z.infer<typeof trackingUpdateSchema>;
+
 export function TrackingUpdateSheet({
   shipment,
   trackingUpdateId,
   onClose,
 }: TrackingUpdateSheetProps) {
   const [open, setOpen] = React.useState(true);
-  const [isPending, setIsPending] = React.useState(false);
-  const formRef = React.useRef<HTMLFormElement>(null);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(trackingUpdateSchema),
+    defaultValues: {
+      status: "pending",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsPending(true);
-    const formData = new FormData(formRef.current!);
-    // Include shipment id and, if applicable, the tracking update id.
-    formData.set("shipmentId", shipment.id);
-
-    if (trackingUpdateId) {
-      formData.set("trackingUpdateId", trackingUpdateId);
-    }
+  const handleSubmit = async (data: FormValues) => {
     try {
+      const formData = new FormData();
+      formData.set("shipmentId", shipment.id);
+      formData.set("location", data.location);
+      formData.set("message", data.message);
+      formData.set("status", data.status);
+
+      if (trackingUpdateId) {
+        formData.set("trackingUpdateId", trackingUpdateId);
+      }
+
       await updateTrackingStatus(formData);
       setOpen(false);
       onClose?.();
     } catch (error) {
       console.error("Failed to update tracking status", error);
-    } finally {
-      setIsPending(false);
     }
   };
-
   return (
     <Sheet
       open={open}
@@ -71,64 +105,94 @@ export function TrackingUpdateSheet({
               : "Add Tracking Update"}
           </SheetTitle>
         </SheetHeader>
-        {/* Shipment details display */}
-        <div className="mb-4 p-4 bg-gray-100 rounded">
-          <p>
-            <strong>Tracking Number:</strong> {shipment.trackingNumber || "N/A"}
+
+        {/* Shipment details */}
+        <div className="mb-4 p-4 bg-gray-100 rounded space-y-2">
+          <p className="text-sm">
+            <span className="font-medium">Tracking Number:</span>{" "}
+            {shipment.trackingNumber || "N/A"}
           </p>
-          <p>
-            <strong>Origin:</strong> {shipment.originCity}
-          </p>
-          <p>
-            <strong>Destination:</strong> {shipment.destinationCity}
-          </p>
-          <p>
-            <strong>Service Type:</strong> {shipment.serviceType}
-          </p>
-          <p>
-            <strong>Estimated Delivery:</strong>{" "}
-            {shipment.estimatedDelivery
-              ? new Date(shipment.estimatedDelivery).toLocaleDateString()
-              : "N/A"}
-          </p>
-          <p>
-            <strong>Payment Status:</strong>{" "}
-            {shipment.isPaid ? "Paid" : "Not Paid"}
-          </p>
-          <p>
-            <strong>Created At:</strong>{" "}
-            {new Date(shipment.createdAt).toLocaleDateString()}
+          <p className="text-sm">
+            <span className="font-medium">Service Type:</span>{" "}
+            {shipment.serviceType}
           </p>
         </div>
-        {/* Form for updating tracking status */}
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Please update the shipment tracking status below:
-          </p>
-          <Input name="location" placeholder="Location" required />
-          <Input name="message" placeholder="Message" required />
-          <Select name="status" defaultValue="pending">
-            <SelectTrigger>
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="on_hold">On Hold</SelectItem>
-              <SelectItem value="in_transit">In Transit</SelectItem>
-              <SelectItem value="delivered">Delivered</SelectItem>
-              <SelectItem value="returned">Returned</SelectItem>
-              <SelectItem value="picked up">Picked Up</SelectItem>
-              <SelectItem value="information_received">
-                Information Received
-              </SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-              {/* Add more statuses as needed */}
-            </SelectContent>
-          </Select>
-          <Button type="submit" disabled={isPending} className="bg-secondary">
-            {isPending ? "Updating..." : "Submit"}
-          </Button>
-        </form>
+
+        {/* Update form */}
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Current location</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Current location" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Message</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Message" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {trackingUpdateSchema.shape.status.options.map(
+                        (status) => (
+                          <SelectItem key={status} value={status}>
+                            {status.replace(/_/g, " ").toUpperCase()}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              className="w-full"
+            >
+              {form.formState.isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {trackingUpdateId ? "Update Status" : "Add Update"}
+            </Button>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );
