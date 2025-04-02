@@ -1,6 +1,6 @@
 // app/lib/schemas.ts
+import { SHIPPING_OPTIONS } from "@/app/(root)/shipments/create/type";
 import { z } from "zod";
-import { SHIPPING_OPTIONS } from "../app/(root)/shipments/create/page";
 
 // Package schema
 export const packageSchema = z.object({
