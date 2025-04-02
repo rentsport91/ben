@@ -298,7 +298,7 @@ export default function ChatWidget() {
                           : "bg-gray-100 text-gray-900"
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap break-words">
+                      <p className="text-sm whitespace-pre-wrap break-words ">
                         {message.content}
                       </p>
                     </div>
@@ -313,7 +313,7 @@ export default function ChatWidget() {
                     <div className="flex flex-col gap-2 mt-3">
                       <button
                         onClick={() => handleQuickOption("I need Support")}
-                        className="text-left py-3 px-4 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
+                        className="text-left text-sm py-2 px-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
                       >
                         I need Support
                       </button>
@@ -321,7 +321,7 @@ export default function ChatWidget() {
                         onClick={() =>
                           handleQuickOption("Get started for Free")
                         }
-                        className="text-left py-3 px-4 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
+                        className="text-left text-sm py-2 px-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
                       >
                         Get started for Free
                       </button>
@@ -329,7 +329,7 @@ export default function ChatWidget() {
                         onClick={() =>
                           handleQuickOption("Chat with Sales Team")
                         }
-                        className="text-left py-3 px-4 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
+                        className="text-left text-sm py-2 px-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
                       >
                         Chat with Sales Team
                       </button>
@@ -340,8 +340,8 @@ export default function ChatWidget() {
               </div>
 
               {/* Message input */}
-              <div className="border-t px-2">
-                <form onSubmit={sendMessage} className="flex items-center p-3">
+              <div className="border-t">
+                <form onSubmit={sendMessage} className="flex items-center px-3">
                   <button
                     type="button"
                     className="text-gray-400 hover:text-gray-600 p-1"
@@ -362,7 +362,7 @@ export default function ChatWidget() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Write a message"
-                    className="flex-1 p-2 mx-2 focus:outline-none"
+                    className="flex-1 p-2 mx-2 focus:outline-none text-sm"
                     disabled={isLoading}
                     aria-label="Write a message"
                   />
