@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
+import { ClockIcon, TruckIcon } from "lucide-react";
 
 interface TrackingEvent {
   id: string;
@@ -16,11 +17,6 @@ interface Sender {
   name: string;
   email: string;
 }
-
-// Type '{ createdAt: Date; trackingNumber: string; estimatedDelivery: Date; originAddress: string; originCity: string; originState: string; originPostalCode: string; originCountry: string; ... 9 more ...; Sender: { ...; } | null; }' is not assignable to type 'TrackingData'.
-//   Types of property 'packages' are incompatible.
-//     Type '{ length: number; packageType: string; width: number; height: number; declaredValue: number; }[]' is not assignable to type 'Package[]'.
-//       Property 'package' is missing in type '{ length: number; packageType: string; width: number; height: number; declaredValue: number; }' but required in type 'Package'.
 
 interface Package {
   height: number;
@@ -119,11 +115,24 @@ export default function TrackingResult({ data }: TrackingResultProps) {
           </div>
           <div className="mt-3 sm:mt-0">
             <span
-              className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getStatusColor(
-                currentStatus
+              className={`...`}
+              role="status"
+              aria-label={`Shipment status: ${currentStatus?.replace(
+                /_/g,
+                " "
               )}`}
             >
-              {currentStatus}
+              {currentStatus === "on_hold" && (
+                <ClockIcon className="w-4 h-4 mr-1.5" />
+              )}
+              {currentStatus === "in_transit" && (
+                <TruckIcon className="w-4 h-4 mr-1.5" />
+              )}
+              {/* Text remains formatted as before */}
+              {currentStatus
+                ?.toLowerCase()
+                .replace(/_/g, " ")
+                .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
             </span>
           </div>
         </div>
@@ -274,7 +283,7 @@ export default function TrackingResult({ data }: TrackingResultProps) {
                 <dt className="text-sm font-medium text-gray-500">
                   Service Type
                 </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 capitalize">
                   {data.serviceType}
                 </dd>
               </div>
@@ -317,20 +326,22 @@ export default function TrackingResult({ data }: TrackingResultProps) {
 function getStatusColor(status: string | null): string {
   switch (status?.toLowerCase()) {
     case "delivered":
-      return "bg-green-200 text-green-800";
+      return "bg-green-100 text-green-800";
     case "in_transit":
-      return "bg-blue-200 text-blue-800";
+      return "bg-blue-100 text-blue-800";
     case "arrived":
-      return "bg-purple-200 text-purple-800";
+      return "bg-purple-100 text-purple-800";
     case "departed":
-      return "bg-indigo-200 text-indigo-800";
+      return "bg-indigo-100 text-indigo-800";
     case "picked_up":
-      return "bg-yellow-200 text-yellow-800";
+      return "bg-amber-100 text-amber-800";
+    case "on_hold": // New status
+      return "bg-orange-100 text-orange-800";
     case "information_received":
-      return "bg-gray-200 text-gray-800";
+      return "bg-gray-100 text-gray-800";
     case "failed":
-      return "bg-red-200 text-red-800";
+      return "bg-red-100 text-red-800";
     default:
-      return "bg-gray-200 text-gray-800";
+      return "bg-gray-100 text-gray-800";
   }
 }
