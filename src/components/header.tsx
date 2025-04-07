@@ -124,15 +124,6 @@ export const Header = () => {
                 </Link>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
-              <div className="flex items-center gap-2 text-gray-300 text-sm relative">
-                <Link href={"/"} className="hover:underline text-xs">
-                  Find Store
-                </Link>
-                <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
-              </div>
-              {/* <div className="flex items-center gap-2 text-gray-300 text-sm relative text-sm">
-                <span>Follow Us On: </span>
-              </div> */}
             </div>
           </div>
         </div>

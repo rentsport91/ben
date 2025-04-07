@@ -103,8 +103,8 @@ export const Footer: React.FC = () => {
               variants={fadeUpVariants}
               custom={1}
             >
-              Reliable, efficient shipping solutions for businesses and
-              individuals worldwide. Fast, secure delivery you can count on.
+              Reliable, efficient shipping and security solutions for businesses
+              and individuals worldwide. Fast, secure delivery you can count on.
             </motion.p>
 
             <motion.div
@@ -133,6 +133,22 @@ export const Footer: React.FC = () => {
                 <span className="text-gray-700">
                   71 Cherry Court Southampton SO53 5PD
                 </span>
+              </motion.div>
+              <motion.div
+                className="flex items-start"
+                variants={fadeUpVariants}
+                custom={3}
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Image
+                  src={"/images/whatsapp.png"}
+                  alt="whatsapp"
+                  width={20}
+                  height={20}
+                  className="text-shipping-600 mr-2 mt-1"
+                />
+                <span className="text-gray-700">+44 7763 090552</span>
               </motion.div>
             </motion.div>
           </motion.div>
