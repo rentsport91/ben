@@ -9,7 +9,7 @@ import { motion } from "motion/react";
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { registerAction } from "@/app/(auth)/register/action";
+import { registerAction } from "@/app/(auth)/_register/action";
 import {
   Form,
   FormControl,
@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import {
   RegisterProps,
   RegisterSchema,
-} from "@/app/(auth)/register/_definitions/schema";
+} from "@/app/(auth)/_register/_definitions/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
