@@ -22,9 +22,6 @@ export default async function ShipmentsRoute() {
 
   // Get shipments from database
   const shipments = await prisma.shipment.findMany({
-    where: {
-      userId: session.user.id,
-    },
     select: {
       id: true,
       originAddress: true,

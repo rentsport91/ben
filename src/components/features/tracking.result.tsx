@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
-import { ClockIcon, TruckIcon } from "lucide-react";
+import { Clock, Truck } from "lucide-react";
 
 interface TrackingEvent {
   id: string;
@@ -115,7 +115,9 @@ export default function TrackingResult({ data }: TrackingResultProps) {
           </div>
           <div className="mt-3 sm:mt-0">
             <span
-              className={`...`}
+              className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getStatusColor(
+                currentStatus
+              )}`}
               role="status"
               aria-label={`Shipment status: ${currentStatus?.replace(
                 /_/g,
@@ -123,10 +125,10 @@ export default function TrackingResult({ data }: TrackingResultProps) {
               )}`}
             >
               {currentStatus === "on_hold" && (
-                <ClockIcon className="w-4 h-4 mr-1.5" />
+                <Clock className="w-4 h-4 mr-1.5" />
               )}
               {currentStatus === "in_transit" && (
-                <TruckIcon className="w-4 h-4 mr-1.5" />
+                <Truck className="w-4 h-4 mr-1.5" />
               )}
               {/* Text remains formatted as before */}
               {currentStatus

@@ -25,7 +25,6 @@ export async function GET() {
   // Everything is valid; update the user to mark the email as verified
   const activeShipmentCount = await prisma.shipment.count({
     where: {
-      userId: user.id,
       TrackingUpdates: {
         some: {
           status: {

@@ -15,9 +15,6 @@ export async function getShipmentHistory(page = 1, limit = 10) {
     const skip = (page - 1) * limit;
 
     const shipments = await prisma.shipment.findMany({
-      where: {
-        userId: session.user.id,
-      },
       orderBy: {
         createdAt: "desc",
       },

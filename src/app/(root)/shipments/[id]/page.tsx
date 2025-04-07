@@ -212,7 +212,9 @@ function getStatusColor(status: string | null): string {
     case "departed":
       return "bg-indigo-100 text-indigo-800";
     case "picked_up":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-amber-100 text-amber-800";
+    case "on_hold": // New status
+      return "bg-orange-100 text-orange-800";
     case "information_received":
       return "bg-gray-100 text-gray-800";
     case "failed":

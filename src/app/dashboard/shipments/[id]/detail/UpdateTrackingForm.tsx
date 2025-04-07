@@ -43,7 +43,7 @@ export const TrackingUpdateForm = async ({
   shipmentId,
 }: TrackingUpdateFormProps) => {
   return (
-    <form action={addTrackingUpdate} method="POST" className="space-y-4">
+    <form action={addTrackingUpdate} method="POST" className="space-y-6">
       <input type="hidden" name="shipmentId" value={shipmentId} />
 
       <div className="flex flex-col gap-2">
@@ -60,12 +60,13 @@ export const TrackingUpdateForm = async ({
             <SelectItem value="in_transit">In Transit</SelectItem>
             <SelectItem value="arrived">Arrived</SelectItem>
             <SelectItem value="departed">Departed</SelectItem>
+            <SelectItem value="on_hold">On Hold</SelectItem>
             <SelectItem value="delivered">Delivered</SelectItem>
             <SelectItem value="failed">Failed</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="message">Message</Label>
         <Input
           id="message"
@@ -75,7 +76,7 @@ export const TrackingUpdateForm = async ({
           required
         />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="location">Location (Optional)</Label>
         <Input
           id="location"

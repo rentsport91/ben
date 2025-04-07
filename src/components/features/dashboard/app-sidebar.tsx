@@ -9,9 +9,9 @@ import {
   Globe,
   HelpCircleIcon,
   LayoutDashboardIcon,
-  MessageCircle,
+  // MessageCircle,
   SettingsIcon,
-  UsersIcon,
+  // UsersIcon,
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -50,17 +50,17 @@ const data = {
       url: "/dashboard/shipments",
       icon: FolderIcon,
     },
-    {
-      title: "Chat",
-      url: "/dashboard/chat",
-      icon: MessageCircle,
-    },
+    // {
+    //   title: "Chat",
+    //   url: "/dashboard/chat",
+    //   icon: MessageCircle,
+    // },
 
-    {
-      title: "Users",
-      url: "/dashboard/users",
-      icon: UsersIcon,
-    },
+    // {
+    //   title: "Users",
+    //   url: "/dashboard/users",
+    //   icon: UsersIcon,
+    // },
   ],
   navClouds: [
     {
