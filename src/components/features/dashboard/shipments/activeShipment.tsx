@@ -30,7 +30,12 @@ export const ActiveShipment = () => {
     fetchShipmentCount();
   }, []);
 
-  if (error) return <div>Error: {error}</div>;
+  if (error)
+    return (
+      <Button variant="outline">
+        <Link href={"/"}>0</Link>
+      </Button>
+    );
   if (count === null)
     return (
       <Button variant="outline" disabled>

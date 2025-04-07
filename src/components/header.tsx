@@ -51,7 +51,7 @@ const mainNavItems = [
 
 const authNavItems = {
   unauthenticated: [
-    { href: "/register", label: "Register" },
+    // { href: "/register", label: "Register" },
     { href: "/login", label: "Login" },
   ],
   authenticated: [
@@ -245,7 +245,7 @@ export const Header = () => {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-full">
+          <SheetContent side="right" className="w-full overflow-y-auto">
             <div className="flex h-full flex-col justify-between py-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -296,7 +296,14 @@ export const Header = () => {
                       </SheetClose>
                     );
                   })}
-
+                  {session?.user.role === "ADMIN" && (
+                    <Link
+                      href={"/dashboard"}
+                      className="flex items-center space-x-2 rounded-md text-sm transition-colors px-3 py-1"
+                    >
+                      <span>Dashboard</span>
+                    </Link>
+                  )}
                   <div className="my-2 h-px w-full bg-border" />
 
                   {isAuthenticated ? (
@@ -311,14 +318,18 @@ export const Header = () => {
                             "User"}
                         </p>
                       </div>
-                      <Notifications />
-                      <ActiveShipment />
-                      <Link
-                        href="/shipments/create"
-                        className="bg-secondary text-white font-medium px-3 py-2 rounded-md"
-                      >
-                        Create Shipment
-                      </Link>
+
+                      {/* <Notifications /> */}
+                      <div className="flex flex-col gap-3 px-3 py-1">
+                        <ActiveShipment />
+
+                        <Link
+                          href="/shipments/create"
+                          className="bg-secondary text-white font-medium px-3 py-2 rounded-md w-52"
+                        >
+                          Create Shipment
+                        </Link>
+                      </div>
                       {authNavItems.authenticated.map((item) => {
                         const Icon = item.icon;
                         return (
