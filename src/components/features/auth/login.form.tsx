@@ -175,7 +175,7 @@ export const LoginForm = () => {
             )}
           </Button>
         </motion.div>
-        <div className="mt-6 text-center text-sm">
+        {/* <div className="mt-6 text-center text-sm">
           <p className="text-gray-600">
             Don&apos;t have an account?
             <button
@@ -185,7 +185,7 @@ export const LoginForm = () => {
               <Link href={"/register"}>Sign up</Link>
             </button>
           </p>
-        </div>
+        </div> */}
       </form>
     </Form>
   );
