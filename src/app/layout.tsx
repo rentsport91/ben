@@ -5,7 +5,6 @@ import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
-import ChatWidget from "@/components/features/chatbot/chat-widget";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className}  antialiased`}>
-        <SessionProvider>
+        <SessionProvider
+          refetchInterval={60 * 60} // 1 hour
+          refetchOnWindowFocus={false}
+        >
           <main className="">{children}</main>
-          <ChatWidget />
 
           <Toaster />
         </SessionProvider>

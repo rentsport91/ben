@@ -8,19 +8,22 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(cuid())
-  name     String
-  phone    String
-  email    String @unique
-  password String
-
-  role      ROLE       @default(USER)
+  id        String      @id @default(cuid())
+  name      String
+  phone     String
+  email     String      @unique
+  password  String
+  status    USER_STATUS @default(OFFLINE)
+  role      ROLE        @default(USER)
   shipments Shipment[]
 
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  profile      Profile?
-  Notification Notification[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  profile       Profile?
+  Notification  Notification[]
+  ChatSession   ChatSession[]
+  Message       Message[]
+  adminPairings AdminUserPairing[] @relation("AdminPairings")
 }
 
 model Address {
@@ -134,6 +137,57 @@ model Notification {
   updatedAt  DateTime          @updatedAt
 }
 
+model ChatSession {
+  id        String   @id @default(cuid())
+  // If the user is registered, link to their User record;
+  // otherwise, these can be set for an anonymous session.
+  userId    String?
+  name      String?
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+  pairing  AdminUserPairing?
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  chatSessionId String
+  senderId      String? // Nullable for anonymous
+  senderName    String? // For anonymous users
+  content       String
+  role          ChatRole @default(USER)
+  createdAt     DateTime @default(now())
+  read          Boolean  @default(false)
+  readBy        String?
+
+  chatSession ChatSession @relation(fields: [chatSessionId], references: [id])
+  sender      User?       @relation(fields: [senderId], references: [id])
+}
+
+model AdminUserPairing {
+  id            String   @id @default(cuid())
+  chatSessionId String   @unique
+  adminId       String
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
+
+  chatSession ChatSession @relation(fields: [chatSessionId], references: [id])
+  admin       User        @relation("AdminPairings", fields: [adminId], references: [id])
+
+  @@unique([chatSessionId, adminId, active])
+}
+
+enum ChatRole {
+  USER
+  ADMIN
+  BOT
+}
+
 enum NOTIFICATION_TYPE {
   DELIVERY_UPDATE
   PAYMENT_REMINDER
@@ -145,4 +199,10 @@ enum ROLE {
   USER
   ADMIN
   MANAGER
+}
+
+enum USER_STATUS {
+  ONLINE
+  AWAY
+  OFFLINE
 }

@@ -1,230 +1,341 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  MessageSquare,
-  X,
-  MoreHorizontal,
-  Send,
-  Smile,
-  Paperclip,
-} from "lucide-react";
-import { z } from "zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
-// Validation schema
-const userSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-});
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  startTransition,
+  useActionState,
+} from "react";
+import { MessageSquare, X, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import Pusher from "pusher-js";
+import {
+  createChatSession,
+  sendMessage,
+  pairWithAdmin,
+} from "@/components/features/chatbot/actions";
 
 type Message = {
   id: string;
-  role: "user" | "bot";
   content: string;
-  timestamp: Date;
+  role: "USER" | "ADMIN" | "BOT";
+  createdAt: Date;
+  senderName?: string;
 };
 
+interface SessionMetadata {
+  id: string;
+  name: string;
+  adminRequested: boolean;
+  pendingAdminMessages: boolean;
+}
+
 export default function ChatWidget() {
-  const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<z.infer<typeof userSchema> | null>(null);
-  const [tempName, setTempName] = useState("");
-  const [tempEmail, setTempEmail] = useState("");
-  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  // Using a custom action hook for sending messages
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [state, action, isPending] = useActionState(sendMessage, null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [initialOptionsShown, setInitialOptionsShown] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [email, setEmail] = useState("");
+  const [username, setUserName] = useState("");
+  const [open, setOpen] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [content, setContent] = useState("");
 
-  const toggleChat = useCallback(() => {
-    setOpen((prev) => !prev);
-    if (!open && user) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [open, user]);
+  // Admin related states
+  const [hasAdmin, setHasAdmin] = useState(false);
+  const [adminRequested, setAdminRequested] = useState(false);
+  const [waitingForAdmin, setWaitingForAdmin] = useState(false);
+  const [pendingAdminMessages, setPendingAdminMessages] = useState(false);
 
-  const handleRegistration = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  // Get environment variables safely with fallbacks
+  const pusherKey = process.env.NEXT_PUBLIC_PUSHER_APP_KEY || "";
+  const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || "eu";
+
+  const pusherRef = useRef<Pusher | null>(null);
+
+  // Restore session from localStorage if available
+  useEffect(() => {
+    const savedSession = localStorage.getItem("chatSession");
+    if (savedSession) {
       try {
-        const result = userSchema.safeParse({
-          name: tempName,
-          email: tempEmail,
-        });
-
-        if (!result.success) {
-          const formattedErrors = result.error.format();
-          setErrors({
-            name: formattedErrors.name?._errors[0],
-            email: formattedErrors.email?._errors[0],
-          });
-          return;
-        }
-
-        setErrors({});
-        setUser(result.data);
-        setInitialOptionsShown(true);
-
-        setMessages([
-          {
-            id: crypto.randomUUID(),
-            role: "bot",
-            content: `Want to chat? I'm an AI chatbot here to help you find your way.`,
-            timestamp: new Date(),
-          },
-        ]);
+        const sessionData = JSON.parse(savedSession) as SessionMetadata;
+        setSessionId(sessionData.id);
+        setUserName(sessionData.name);
+        setAdminRequested(sessionData.adminRequested);
+        setPendingAdminMessages(sessionData.pendingAdminMessages);
       } catch (error) {
-        console.error("Registration failed:", error);
+        console.error("Failed to restore chat session:", error);
+        localStorage.removeItem("chatSession");
       }
-    },
-    [tempName, tempEmail]
-  );
-
-  const handleQuickOption = useCallback((option: string) => {
-    setInitialOptionsShown(false);
-    const newMessage: Message = {
-      id: crypto.randomUUID(),
-      role: "user",
-      content: option,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
-
-    setTimeout(() => {
-      let response = "";
-      switch (option) {
-        case "I need Support":
-          response =
-            "I'm happy to help with support! What specific issue are you experiencing?";
-          break;
-        case "Get started for Free":
-          response =
-            "Great! Let me walk you through our free options. What are you looking to accomplish?";
-          break;
-        // case "Chat with Sales Team":
-        //   response =
-        //     "I'll connect you with our sales team. Could you tell me a bit about what you're looking for?";
-        //   break;
-        default:
-          response = "How can I assist you today?";
-      }
-
-      const botResponse: Message = {
-        id: crypto.randomUUID(),
-        role: "bot",
-        content: response,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, botResponse]);
-    }, 1000);
+    }
   }, []);
 
-  const sendMessage = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!input.trim() || !user) return;
-
-      setInitialOptionsShown(false);
-      const newMessage: Message = {
-        id: crypto.randomUUID(),
-        role: "user",
-        content: input,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, newMessage]);
-      setInput("");
-      setIsLoading(true);
-
-      try {
-        // Simulated API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const botResponse: Message = {
-          id: crypto.randomUUID(),
-          role: "bot",
-          content: `Thanks for your message! How else can I help you with "${input.substring(
-            0,
-            30
-          )}${input.length > 30 ? "..." : ""}"?`,
-          timestamp: new Date(),
-        };
-
-        setMessages((prev) => [...prev, botResponse]);
-      } catch (error) {
-        console.error("Failed to send message:", error);
-        const errorMessage: Message = {
-          id: crypto.randomUUID(),
-          role: "bot",
-          content:
-            "Sorry, there was an error sending your message. Please try again.",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
-      } finally {
-        setIsLoading(false);
-        inputRef.current?.focus();
-      }
-    },
-    [input, user]
-  );
-
-  // Close chat when clicking outside
+  // Initialize Pusher for admin presence
   useEffect(() => {
-    if (!open) return;
+    if (!pusherRef.current && pusherKey && pusherCluster) {
+      pusherRef.current = new Pusher(pusherKey, {
+        cluster: pusherCluster,
+      });
+      console.log("Pusher client initialized");
+    }
 
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".chat-widget") && !target.closest(".chat-toggle")) {
-        setOpen(false);
-      }
-    };
+    const channel = pusherRef.current?.subscribe(`presence-admins`);
 
-    document.addEventListener("mousedown", handleClickOutside);
+    channel?.bind("pusher:subscription_succeeded", () => {
+      console.log("Connected to admin presence channel");
+    });
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      if (channel) {
+        channel.unbind_all();
+        channel.unsubscribe();
+      }
     };
-  }, [open]);
+  }, [pusherKey, pusherCluster]);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, open]);
+  const startChat = async ({
+    email,
+    username,
+  }: {
+    email: string;
+    username: string;
+  }) => {
+    const result = await createChatSession(username, email);
+    if (result.success && result.session) {
+      setSessionId(result.session.id);
 
-  // Initial welcome message
-  useEffect(() => {
-    if (open && !user && messages.length === 0) {
+      // Store session data in localStorage
+      const sessionData: SessionMetadata = {
+        id: result.session.id,
+        name: username,
+        adminRequested: false,
+        pendingAdminMessages: false,
+      };
+      localStorage.setItem("chatSession", JSON.stringify(sessionData));
+
       setMessages([
         {
-          id: crypto.randomUUID(),
-          role: "bot",
-          content: "Want to chat? Enter your details to get started.",
-          timestamp: new Date(),
+          id: "welcome",
+          content: "How can I help you today?",
+          role: "BOT",
+          createdAt: new Date(),
         },
       ]);
     }
-  }, [open, user, messages.length]);
+  };
+
+  // Listen for messages and admin pairing on the chat channel
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const messageChannel = pusherRef.current?.subscribe(`chat-${sessionId}`);
+
+    // Handle admin pairing event
+    messageChannel?.bind("admin-paired", () => {
+      setHasAdmin(true);
+      setWaitingForAdmin(false);
+
+      // Update messages to notify user of admin connection
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `admin-joined-${Date.now()}`,
+          content: `${"Agent"} has joined the chat.`,
+          role: "BOT",
+          createdAt: new Date(),
+        },
+      ]);
+
+      // Update localStorage
+      if (localStorage.getItem("chatSession")) {
+        const sessionData = JSON.parse(
+          localStorage.getItem("chatSession")!
+        ) as SessionMetadata;
+        sessionData.adminRequested = true;
+        sessionData.pendingAdminMessages = false;
+        localStorage.setItem("chatSession", JSON.stringify(sessionData));
+      }
+    });
+
+    // Handle new messages
+    messageChannel?.bind("new-message", (data: Message) => {
+      setMessages((prevState) => {
+        // Remove any optimistic message that matches the confirmed message
+        const filtered = prevState.filter(
+          (msg) =>
+            !(
+              msg.id.startsWith("local-") &&
+              msg.content === data.content &&
+              msg.role === data.role
+            )
+        );
+        return [...filtered, { ...data, createdAt: new Date(data.createdAt) }];
+      });
+    });
+
+    return () => {
+      messageChannel?.unbind_all();
+      messageChannel?.unsubscribe();
+    };
+  }, [sessionId]);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim() || !sessionId) return;
+
+    // Capture the content before clearing it
+    const currentContent = content;
+
+    // Create an optimistic message
+    const localMessage: Message = {
+      id: `local-${Date.now()}`,
+      content: currentContent,
+      role: "USER",
+      createdAt: new Date(),
+      senderName: username,
+    };
+
+    setMessages((prev) => [...prev, localMessage]);
+    setContent("");
+
+    // If admin was requested but not connected, set pendingAdminMessages
+    if (adminRequested && !hasAdmin) {
+      setPendingAdminMessages(true);
+
+      // Update localStorage
+      if (localStorage.getItem("chatSession")) {
+        const sessionData = JSON.parse(
+          localStorage.getItem("chatSession")!
+        ) as SessionMetadata;
+        sessionData.pendingAdminMessages = true;
+        localStorage.setItem("chatSession", JSON.stringify(sessionData));
+      }
+    }
+
+    // Wrap the action call in startTransition so that isPending updates correctly
+    startTransition(() => {
+      (async () => {
+        try {
+          const formData = new FormData();
+          formData.append("content", currentContent);
+          formData.append("sessionId", sessionId);
+          formData.append("senderName", username);
+          await action(formData);
+        } catch (error) {
+          console.error("Error sending message:", error);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `error-${Date.now()}`,
+              content: "Failed to send message. Please try again.",
+              role: "BOT",
+              createdAt: new Date(),
+            },
+          ]);
+        }
+      })();
+    });
+  };
+
+  const requestAdmin = async () => {
+    if (!sessionId) return;
+
+    setWaitingForAdmin(true);
+    setAdminRequested(true);
+
+    // Update localStorage
+    if (localStorage.getItem("chatSession")) {
+      const sessionData = JSON.parse(
+        localStorage.getItem("chatSession")!
+      ) as SessionMetadata;
+      sessionData.adminRequested = true;
+      localStorage.setItem("chatSession", JSON.stringify(sessionData));
+    }
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `waiting-${Date.now()}`,
+        content:
+          "We've received your request to speak to an agent. You can continue sending messages and an agent will respond when available.",
+        role: "BOT",
+        createdAt: new Date(),
+      },
+    ]);
+
+    try {
+      const result = await pairWithAdmin(sessionId);
+      if (!result.success) {
+        setWaitingForAdmin(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `admin-status-${Date.now()}`,
+            content:
+              "Our agents are currently unavailable. Your messages will be saved and an agent will respond as soon as possible.",
+            role: "BOT",
+            createdAt: new Date(),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error pairing with admin:", error);
+      setWaitingForAdmin(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          content:
+            "Our agents are currently unavailable. Your messages will be saved and an agent will respond as soon as possible.",
+          role: "BOT",
+          createdAt: new Date(),
+        },
+      ]);
+    }
+  };
+
+  // Clear the current chat session
+  const handleEndChat = () => {
+    localStorage.removeItem("chatSession");
+    setSessionId("");
+    setMessages([]);
+    setAdminRequested(false);
+    setHasAdmin(false);
+    setPendingAdminMessages(false);
+    setWaitingForAdmin(false);
+  };
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
-      {open && (
-        <div className="chat-widget w-[350px] bg-white rounded-lg shadow-lg flex flex-col border-4 border-purple-200">
-          {/* Header */}
-          <div className="p-4 flex justify-between items-center border-b">
-            <h2 className="font-bold text-sm">Chat Box</h2>
+    <div className="fixed bottom-4 right-4 z-50">
+      {open ? (
+        <div className="w-[350px] bg-white rounded-lg shadow-lg border">
+          <div className="p-4 border-b flex justify-between items-center bg-gray-50">
+            <h3 className="font-semibold">Chat Support</h3>
             <div className="flex gap-2">
+              {sessionId && (
+                <button
+                  onClick={handleEndChat}
+                  className="text-gray-500 hover:text-red-500"
+                  aria-label="End chat"
+                >
+                  End Chat
+                </button>
+              )}
               <button
-                className="text-gray-500 hover:text-gray-700"
-                aria-label="More options"
-              >
-                <MoreHorizontal size={20} />
-              </button>
-              <button
-                onClick={toggleChat}
+                onClick={() => setOpen(false)}
                 className="text-gray-500 hover:text-gray-700"
                 aria-label="Close chat"
               >
@@ -233,171 +344,139 @@ export default function ChatWidget() {
             </div>
           </div>
 
-          {!user ? (
-            // Registration form
-            <div className="p-4 flex-1 overflow-y-auto">
-              <form onSubmit={handleRegistration} className="space-y-4">
-                <div>
-                  <Input
-                    type="text"
-                    placeholder="Full Name"
-                    value={tempName}
-                    onChange={(e) => setTempName(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-400 focus:outline-none ${
-                      errors.name ? "border-red-500" : "border-gray-300"
+          <div className="h-[500px] flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.role === "USER" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[85%] p-3 rounded-lg ${
+                      message.role === "USER"
+                        ? "bg-blue-600 text-white"
+                        : message.role === "ADMIN"
+                        ? "bg-gray-800 text-white"
+                        : "bg-gray-100"
                     }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      {message.senderName && (
+                        <span className="text-xs font-medium">
+                          {message.senderName}
+                        </span>
+                      )}
+                      <time
+                        className="text-xs opacity-75"
+                        dateTime={new Date(message.createdAt).toISOString()}
+                      >
+                        {new Date(message.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </time>
+                    </div>
+                    <p className="text-sm break-words">{message.content}</p>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            <div className="border-t p-4">
+              {!sessionId ? (
+                <div className="space-y-4">
+                  <Input
+                    placeholder="Your name"
+                    value={username}
+                    onChange={(e) => setUserName(e.target.value)}
                     aria-label="Your name"
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                  )}
-                </div>
-
-                <div>
                   <Input
-                    type="email"
-                    placeholder="Email"
-                    value={tempEmail}
-                    onChange={(e) => setTempEmail(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-400 focus:outline-none ${
-                      errors.email ? "border-red-500" : "border-gray-300"
-                    }`}
+                    placeholder="Email (optional)"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     aria-label="Your email"
                   />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-secondary text-white p-3 rounded-md hover:bg-secondary/80 transition-colors"
-                >
-                  Start Chatting
-                </Button>
-              </form>
-            </div>
-          ) : (
-            <>
-              {/* Chat content */}
-              <div
-                className="flex-1 overflow-y-auto p-4 space-y-4"
-                style={{ maxHeight: "350px" }}
-              >
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                  <Button
+                    onClick={() => startChat({ username, email })}
+                    className="w-full"
+                    disabled={!username.trim()}
                   >
-                    <div
-                      className={`max-w-[85%] p-3 rounded-lg ${
-                        message.role === "user"
-                          ? "bg-secondary text-white"
-                          : "bg-gray-100 text-gray-900"
-                      }`}
+                    Start Chat
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <form onSubmit={handleSend} className="flex gap-2">
+                    <Textarea
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder={
+                        hasAdmin
+                          ? "Message support agent..."
+                          : adminRequested
+                          ? "Message to agent (offline)..."
+                          : "Type your message"
+                      }
+                      className="resize-none flex-1"
+                      disabled={isPending}
+                      aria-label="Type your message"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSend(e);
+                        }
+                      }}
+                    />
+                    <Button
+                      type="submit"
+                      size="icon"
+                      disabled={isPending || !content.trim()}
+                      aria-label="Send message"
                     >
-                      <p className="text-sm whitespace-pre-wrap break-words ">
-                        {message.content}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Quick option buttons */}
-                {initialOptionsShown &&
-                  user &&
-                  messages.length > 0 &&
-                  messages[messages.length - 1].role === "bot" && (
-                    <div className="flex flex-col gap-2 mt-3">
-                      <button
-                        onClick={() => handleQuickOption("I need Support")}
-                        className="text-left text-sm py-2 px-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        I need Support
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleQuickOption("Get started for Free")
-                        }
-                        className="text-left text-sm py-2 px-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        Get started for Free
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleQuickOption("Chat with Sales Team")
-                        }
-                        className="text-left text-sm py-2 px-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        Chat with Sales Team
-                      </button>
+                      {isPending ? (
+                        <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Send size={18} />
+                      )}
+                    </Button>
+                  </form>
+                  {!hasAdmin && !adminRequested && (
+                    <Button
+                      onClick={requestAdmin}
+                      variant="outline"
+                      className="w-full mt-2"
+                      disabled={waitingForAdmin}
+                    >
+                      {waitingForAdmin
+                        ? "Connecting..."
+                        : "Talk to Human Agent"}
+                    </Button>
+                  )}
+                  {adminRequested && !hasAdmin && (
+                    <div className="text-xs text-gray-500 text-center mt-2">
+                      {pendingAdminMessages
+                        ? "Your messages will be viewed by an agent when they connect"
+                        : "Request sent - an agent will connect when available"}
                     </div>
                   )}
-
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Message input */}
-              <div className="border-t">
-                <form onSubmit={sendMessage} className="flex items-center px-3">
-                  <button
-                    type="button"
-                    className="text-gray-400 hover:text-gray-600 p-1"
-                    aria-label="Add emoji"
-                  >
-                    <Smile size={20} />
-                  </button>
-                  <button
-                    type="button"
-                    className="text-gray-400 hover:text-gray-600 p-1"
-                    aria-label="Attach file"
-                  >
-                    <Paperclip size={20} />
-                  </button>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Write a message"
-                    className="flex-1 p-2 mx-2 focus:outline-none text-sm"
-                    disabled={isLoading}
-                    aria-label="Write a message"
-                  />
-                  <button
-                    type="submit"
-                    className={`p-2 rounded-full ${
-                      isLoading || !input.trim()
-                        ? "text-gray-400"
-                        : "text-secondary hover:text-secondary/80"
-                    }`}
-                    disabled={isLoading || !input.trim()}
-                    aria-label="Send message"
-                  >
-                    <Send size={20} />
-                  </button>
-                </form>
-
-                {/* Powered by footer */}
-                <div className="text-center text-xs text-gray-500 py-2">
-                  Powered by Kasper :)
-                </div>
-              </div>
-            </>
-          )}
+                </>
+              )}
+            </div>
+          </div>
         </div>
+      ) : (
+        <button
+          onClick={() => setOpen(true)}
+          className="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center shadow-lg hover:bg-secondary/80 transition-colors"
+          aria-label="Open chat"
+        >
+          <MessageSquare size={24} />
+        </button>
       )}
-
-      {/* Chat toggle button */}
-      <button
-        onClick={toggleChat}
-        className="chat-toggle w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center hover:bg-secondary/80 transition-colors shadow-lg"
-        aria-label={open ? "Close chat" : "Open chat"}
-      >
-        {open ? <X size={24} /> : <MessageSquare size={24} />}
-      </button>
     </div>
   );
 }

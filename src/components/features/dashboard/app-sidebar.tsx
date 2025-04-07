@@ -2,15 +2,14 @@
 
 import * as React from "react";
 import {
-  BarChartIcon,
   CameraIcon,
-  Car,
   FileCodeIcon,
   FileTextIcon,
   FolderIcon,
   Globe,
   HelpCircleIcon,
   LayoutDashboardIcon,
+  MessageCircle,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
@@ -52,15 +51,11 @@ const data = {
       icon: FolderIcon,
     },
     {
-      title: "Orders",
-      url: "/dashboard/orders",
-      icon: BarChartIcon,
+      title: "Chat",
+      url: "/dashboard/chat",
+      icon: MessageCircle,
     },
-    {
-      title: "Drivers",
-      url: "/dashboard/drivers",
-      icon: Car,
-    },
+
     {
       title: "Users",
       url: "/dashboard/users",

@@ -193,7 +193,7 @@ export const Header = () => {
                   {session.user.role === "ADMIN" && (
                     <Link
                       href={"/dashboard"}
-                      className="flex items-center space-x-2 rounded-md text-sm font-medium transition-colors"
+                      className="flex items-center space-x-2 rounded-md text-sm transition-colors"
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       <span>Dashboard</span>
