@@ -119,7 +119,7 @@ export const Footer: React.FC = () => {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <Mail size={18} className="text-shipping-600 mr-3" />
-                <span className="text-gray-700">info@logistex.com</span>
+                <span className="text-gray-700">admin@logistex.org</span>
               </motion.div>
 
               <motion.div

@@ -1,9 +1,16 @@
-import Pusher from "pusher";
+import PusherClient from "pusher-js";
 
-export const pusher = new Pusher({
-  appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID!,
-  key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
-  secret: process.env.NEXT_PUBLIC_PUSHER_APP_SECRET!,
-  cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER!,
-  useTLS: true,
-});
+// Allows you to use Pusher inside Next.js "use client" components.
+export const pusherClient = new PusherClient(
+  process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
+  {
+    cluster: "eu",
+    authEndpoint: "/api/pusher-auth",
+    authTransport: "ajax",
+    auth: {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  }
+);

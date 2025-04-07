@@ -205,4 +205,5 @@ enum USER_STATUS {
   ONLINE
   AWAY
   OFFLINE
+  ENDED
 }
