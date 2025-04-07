@@ -9,7 +9,7 @@ import { motion } from "motion/react";
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { registerAction } from "@/app/(auth)/_register/action";
+import { registerAction } from "@/components/features/auth/action";
 import {
   Form,
   FormControl,
