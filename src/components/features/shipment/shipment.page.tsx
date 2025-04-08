@@ -144,7 +144,7 @@ export const ShipmentsPage = ({ shipments }: { shipments: Shipment[] }) => {
     shipmentId: string
   ) => {
     e.stopPropagation();
-    router.push(`/shipments/${shipmentId}/details`);
+    router.push(`/shipments/${shipmentId}`);
   };
 
   const handleDownloadReceipt = (
