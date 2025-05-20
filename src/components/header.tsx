@@ -43,7 +43,7 @@ import { ActiveShipment } from "./features/dashboard/shipments/activeShipment";
 // Navigation items definition
 const mainNavItems = [
   { href: "/", label: "Home" },
-  { href: "/ship", label: "Ship" },
+  // { href: "/ship", label: "Ship" },
   { href: "/track", label: "Track" },
   { href: "/services", label: "Services" },
   { href: "/support", label: "Support" },
@@ -102,13 +102,13 @@ export const Header = () => {
               <div className="flex items-center gap-2 text-gray-300 relative">
                 <MapPin className="text-secondary" size={20} />
                 <span className="text-xs">
-                  71 Cherry Court Southampton SO53 5PD
+                  6512 hillside Brooke ave Las vegas
                 </span>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
                 <Mail className="text-secondary" size={20} />
-                <span className="text-xs">admin@logistex.org</span>
+                <span className="text-xs">admin@amermaxlogistics.org</span>
                 <div className="absolute -right-5 w-0.5 h-4 bg-gray-500" />
               </div>
               <div className="flex items-center gap-2 text-gray-300 text-sm relative">
@@ -264,11 +264,11 @@ export const Header = () => {
                     <div className="flex flex-col h-full">
                       <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
                         <MapPin className="text-secondary" size={20} />
-                        <span>71 Cherry Court Southampton SO53 5PD</span>
+                        <span>6512 hillside Brooke ave Las vegas</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
                         <Mail className="text-secondary" size={20} />
-                        <span>admin@logistex.org</span>
+                        <span>admin@amermaxlogistics.org</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-300 text-sm relative p-2">
                         <Clock className="text-secondary" size={20} />

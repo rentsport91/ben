@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Logistex Shipping",
-  description: "Our Global Shipping Solutions",
+  title: "Amermax logistics",
+  description: "Our Global logistics Solutions",
   icons: {
     icon: "/favicon.ico",
   },

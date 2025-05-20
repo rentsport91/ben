@@ -90,8 +90,8 @@ export const Footer: React.FC = () => {
             <motion.div variants={fadeUpVariants} custom={0}>
               <Link href="/" className="flex items-center space-x-2 mb-5">
                 <Image
-                  src={"/images/logo.svg"}
-                  width={150}
+                  src={"/images/logo.png"}
+                  width={200}
                   height={150}
                   alt="logo"
                 />
@@ -119,7 +119,9 @@ export const Footer: React.FC = () => {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <Mail size={18} className="text-shipping-600 mr-3" />
-                <span className="text-gray-700">admin@logistex.org</span>
+                <span className="text-gray-700">
+                  admin@amermaxlogistics.org
+                </span>
               </motion.div>
 
               <motion.div
@@ -131,7 +133,7 @@ export const Footer: React.FC = () => {
               >
                 <MapPin size={18} className="text-shipping-600 mr-3 mt-1" />
                 <span className="text-gray-700">
-                  71 Cherry Court Southampton SO53 5PD
+                  6512 hillside Brooke ave Las vegas
                 </span>
               </motion.div>
               <motion.div
@@ -148,7 +150,7 @@ export const Footer: React.FC = () => {
                   height={20}
                   className="text-shipping-600 mr-2 mt-1"
                 />
-                <span className="text-gray-700">+44 7763 090552</span>
+                <span className="text-gray-700">+1 9129801024</span>
               </motion.div>
             </motion.div>
           </motion.div>
@@ -327,7 +329,8 @@ export const Footer: React.FC = () => {
             className="text-gray-500 text-sm mb-4 md:mb-0"
             variants={fadeUpVariants}
           >
-            &copy; {new Date().getFullYear()} Logistex. All rights reserved.
+            &copy; {new Date().getFullYear()} Amermax logistics. All rights
+            reserved.
           </motion.p>
           <motion.div
             className="flex flex-wrap justify-center space-x-4 text-sm"

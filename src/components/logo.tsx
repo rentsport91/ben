@@ -11,9 +11,9 @@ export const Logo = () => (
   >
     <Link href="/">
       <Image
-        src="/images/logo.svg"
+        src="/images/logo.png"
         alt="site logo"
-        width={120}
+        width={200}
         height={150}
         className="transition-all duration-300"
       />

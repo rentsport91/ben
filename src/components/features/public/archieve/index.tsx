@@ -119,7 +119,7 @@ export const Achievement = () => {
               }}
             >
               <Image
-                src="/images/port.jpg"
+                src="/images/port.jpeg"
                 alt="Port operations with cargo containers"
                 fill
                 className="object-cover"

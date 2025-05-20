@@ -142,8 +142,8 @@ export const Choice = () => {
               variants={fadeInUpVariants}
               className="w-full lg:w-5/6 text-sm md:text-base text-gray-700 leading-relaxed"
             >
-              At Logistex, we&apos;re committed to delivering top-tier logistics
-              services with unmatched reliability and efficiency. Our
+              At Amermax logistics, we&apos;re committed to delivering top-tier
+              logistics services with unmatched reliability and efficiency. Our
               comprehensive approach combines advanced technology, expert teams,
               and sustainable practices to ensure your shipments arrive safely
               and on time.
