@@ -36,6 +36,8 @@ export default async function ShipmentsRoute() {
       estimatedDelivery: true,
       deliveredAt: true,
       trackingNumber: true,
+      originPostalCode: true,
+      destinationPostalCode: true,
       packages: {
         select: {
           id: true,
@@ -119,6 +121,8 @@ export default async function ShipmentsRoute() {
       destination: destination,
       date: dateFormatted,
       eta: etaFormatted,
+      originPostalCode: shipment.destinationPostalCode,
+      destinationPostalCode: shipment.destinationPostalCode,
       delivered: deliveredFormatted,
       items: shipment.packages.length,
       weight: `${totalWeight.toFixed(1)} kg`,

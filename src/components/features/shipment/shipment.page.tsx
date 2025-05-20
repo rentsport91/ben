@@ -69,6 +69,8 @@ export type Shipment = {
   weight: string;
   type: string;
   value: string;
+  originPostalCode: string;
+  destinationPostalCode: string;
   lastUpdate: string;
   recipient: {
     name: string;
