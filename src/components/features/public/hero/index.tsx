@@ -126,9 +126,9 @@ export const Hero = () => {
           className="relative w-full md:w-1/2 md:self-end mx-auto md:mx-0 hidden md:flex justify-center"
         >
           <Image
-            src={"/images/delivery-man.webp"}
-            width={500}
-            height={500}
+            src={"/images/delivery-man.png"}
+            width={400}
+            height={400}
             alt="delivery-man"
             className=""
           />
