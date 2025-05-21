@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import {
   RegisterProps,
   RegisterSchema,
-} from "@/app/(auth)/register/definitions/schema";
+} from "@/app/(auth)/_register/_definitions/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

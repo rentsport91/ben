@@ -1,15 +1,26 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
-import { Clock, Truck } from "lucide-react";
+import {
+  Truck,
+  Check,
+  AlertTriangle,
+  Package,
+  Home,
+  MapPin,
+  Calendar,
+  Box,
+  User,
+} from "lucide-react";
 
 interface TrackingEvent {
   id: string;
   timestamp: Date;
   location: string | null;
-  status: string | null; // Allow null here
+  status: string | null;
   message: string;
 }
 
@@ -22,12 +33,15 @@ interface Package {
   height: number;
   width: number;
   length: number;
+  weight: number;
   packageType: string;
   declaredValue: number | null;
 }
 
 interface Recipient {
   name: string;
+  email?: string;
+  phone?: string;
 }
 
 interface TrackingData {
@@ -44,9 +58,10 @@ interface TrackingData {
   destinationPostalCode: string;
   destinationCountry: string;
   serviceType: string;
+  carrier: "DHL" | "FedEx" | "UPS";
   TrackingUpdates: TrackingEvent[];
   createdAt: Date;
-  Sender: Sender | null;
+  sender: Sender | null;
   recipient: Recipient;
   packages: Package[];
 }
@@ -60,31 +75,37 @@ export default function TrackingResult({ data }: TrackingResultProps) {
     "timeline"
   );
 
-  console.log(data);
-
   const formatDate = (input: string | Date): string => {
     try {
       const date = input instanceof Date ? input : parseISO(input);
-      return format(date, "MMM d, yyyy h:mm a");
+      return format(date, "EEEE, MMMM d, yyyy 'at' h:mm a");
     } catch (error) {
-      console.error(error);
+      return typeof input === "string" ? input : input.toString();
+    }
+  };
+
+  const formatShortDate = (input: string | Date): string => {
+    try {
+      const date = input instanceof Date ? input : parseISO(input);
+      return format(date, "MMM d, h:mm a");
+    } catch (error) {
       return typeof input === "string" ? input : input.toString();
     }
   };
 
   if (!data) {
     return (
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+      <div className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold text-red-600 mb-4">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">
             Error Retrieving Tracking Information
           </h1>
-          <p className="text-gray-500 mb-6">
-            We were unable to find tracking information for the provided number.
+          <p className="text-gray-600 mb-6">
+            We couldn&apos;t find tracking details for the provided number.
           </p>
           <Link
             href="/track"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
             Try Again
           </Link>
@@ -93,91 +114,158 @@ export default function TrackingResult({ data }: TrackingResultProps) {
     );
   }
 
-  // Assume the latest event is the last one in the timeline (ordered ascending)
   const currentStatus =
     data.TrackingUpdates.length > 0
       ? data.TrackingUpdates[data.TrackingUpdates.length - 1].status
       : "";
 
+  // Calculate progress percentage based on status
+  const getProgressPercentage = () => {
+    const statusOrder = [
+      "information_received",
+      "processing",
+      "picked_up",
+      "departed",
+      "in_transit",
+      "arrived",
+      "out_for_delivery",
+      "delivered",
+    ];
+
+    const currentIndex = statusOrder.indexOf(
+      currentStatus?.toLowerCase() || ""
+    );
+    return currentIndex >= 0
+      ? ((currentIndex + 1) / statusOrder.length) * 100
+      : 10;
+  };
+
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg container mx-auto">
-      {/* Header */}
-      <div className="px-4 py-5 sm:px-6 bg-gray-50">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-          <div>
-            <h3 className="text-lg font-medium text-gray-900">
-              Tracking Information
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Tracking Number:{" "}
-              <span className="font-medium">{data.trackingNumber}</span>
-            </p>
-          </div>
-          <div className="mt-3 sm:mt-0">
-            <span
-              className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getStatusColor(
-                currentStatus
-              )}`}
-              role="status"
-              aria-label={`Shipment status: ${currentStatus?.replace(
-                /_/g,
-                " "
-              )}`}
-            >
-              {currentStatus === "on_hold" && (
-                <Clock className="w-4 h-4 mr-1.5" />
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden max-w-4xl mx-auto mb-8">
+      {/* Carrier-specific header */}
+      <div
+        className={`py-3 px-6 ${
+          data.carrier === "DHL"
+            ? "bg-yellow-500"
+            : data.carrier === "FedEx"
+            ? "bg-purple-800"
+            : "bg-brown-600"
+        } flex justify-between items-center`}
+      >
+        <div className="flex items-center">
+          <Truck className="h-6 w-6 text-white mr-2" />
+          <span className="text-white font-bold text-lg">
+            {data.carrier} Tracking
+          </span>
+        </div>
+        <span className="text-white font-medium">{data.trackingNumber}</span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="bg-gray-100 h-2 w-full">
+        <div
+          className={`h-full ${
+            currentStatus?.toLowerCase() === "delivered"
+              ? "bg-green-500"
+              : "bg-blue-500"
+          }`}
+          style={{ width: `${getProgressPercentage()}%` }}
+        ></div>
+      </div>
+
+      {/* Status banner */}
+      {currentStatus && (
+        <div
+          className={`px-6 py-4 ${
+            currentStatus.toLowerCase() === "delivered"
+              ? "bg-green-50 border-b border-green-100"
+              : currentStatus.toLowerCase() === "on_hold"
+              ? "bg-orange-50 border-b border-orange-100"
+              : "bg-blue-50 border-b border-blue-100"
+          }`}
+        >
+          <div className="flex items-center">
+            {currentStatus.toLowerCase() === "delivered" ? (
+              <Check className="h-5 w-5 text-green-500 mr-2" />
+            ) : currentStatus.toLowerCase() === "on_hold" ? (
+              <AlertTriangle className="h-5 w-5 text-orange-500 mr-2" />
+            ) : (
+              <Truck className="h-5 w-5 text-blue-500 mr-2" />
+            )}
+            <div>
+              <h3 className="font-medium">
+                {currentStatus
+                  ?.replace(/_/g, " ")
+                  .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+              </h3>
+              {currentStatus.toLowerCase() === "delivered" && (
+                <p className="text-sm text-gray-600">
+                  Delivered on{" "}
+                  {formatDate(
+                    data.TrackingUpdates[data.TrackingUpdates.length - 1]
+                      .timestamp
+                  )}
+                </p>
               )}
-              {currentStatus === "in_transit" && (
-                <Truck className="w-4 h-4 mr-1.5" />
-              )}
-              {/* Text remains formatted as before */}
-              {currentStatus
-                ?.toLowerCase()
-                .replace(/_/g, " ")
-                .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
-            </span>
+            </div>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm font-medium text-gray-500">From</p>
-            <p className="mt-1 text-sm text-gray-900">{data.originCountry}</p>
+      )}
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border-b">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="flex items-center mb-2">
+            <MapPin className="h-5 w-5 text-gray-500 mr-2" />
+            <h4 className="font-medium text-gray-700">From</h4>
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">To</p>
-            <p className="mt-1 text-sm text-gray-900">
-              {data.destinationCountry}
-            </p>
+          <p className="text-gray-900 font-medium">
+            {data.originCity}, {data.originCountry}
+          </p>
+          <p className="text-sm text-gray-600">{data.originAddress}</p>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="flex items-center mb-2">
+            <MapPin className="h-5 w-5 text-gray-500 mr-2" />
+            <h4 className="font-medium text-gray-700">To</h4>
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">
-              Estimated Delivery
-            </p>
-            <p className="mt-1 text-sm text-gray-900">
-              {formatDate(data.estimatedDelivery)}
-            </p>
+          <p className="text-gray-900 font-medium">
+            {data.destinationCity}, {data.destinationCountry}
+          </p>
+          <p className="text-sm text-gray-600">{data.destinationAddress}</p>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="flex items-center mb-2">
+            <Calendar className="h-5 w-5 text-gray-500 mr-2" />
+            <h4 className="font-medium text-gray-700">Estimated Delivery</h4>
           </div>
+          <p className="text-gray-900 font-medium">
+            {formatDate(data.estimatedDelivery)}
+          </p>
+          <p className="text-sm text-gray-600">{data.serviceType}</p>
         </div>
       </div>
 
       {/* Tab Navigation */}
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex" aria-label="Tabs">
+        <nav className="flex" aria-label="Tabs">
           <button
             onClick={() => setActiveTab("timeline")}
-            className={`w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm ${
+            className={`flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm ${
               activeTab === "timeline"
-                ? "border-secondary text-secondary"
+                ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
           >
-            Timeline
+            Shipment Progress
           </button>
           <button
             onClick={() => setActiveTab("details")}
-            className={`w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm ${
+            className={`flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm ${
               activeTab === "details"
-                ? "border-secondary text-secondary"
+                ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
           >
@@ -187,142 +275,196 @@ export default function TrackingResult({ data }: TrackingResultProps) {
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 py-5 sm:p-6">
+      <div className="p-6">
         {activeTab === "timeline" ? (
-          <div className="flow-root">
-            <ul className="-mb-8">
-              {data.TrackingUpdates.map((event, idx) => (
-                <li key={event.id}>
-                  <div className="relative pb-8">
-                    {idx !== data.TrackingUpdates.length - 1 && (
-                      <span
-                        className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <div className="relative flex items-start space-x-3">
-                      <div className="relative">
-                        <div
-                          className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${getStatusColor(
-                            event.status
-                          )}`}
-                        >
-                          <svg
-                            className="h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm">
-                          <p className="font-medium text-gray-900">
-                            {event.status}
-                          </p>
-                          <p className="mt-0.5 text-gray-500">
-                            {formatDate(event.timestamp)}
-                          </p>
-                        </div>
-                        <div className="mt-2 text-sm text-gray-700">
-                          <p>{event.message}</p>
-                        </div>
-                        {event.location && (
-                          <div className="mt-1 text-sm text-gray-500">
-                            <p>{event.location}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+          <div className="space-y-8">
+            {data.TrackingUpdates.map((event, idx) => (
+              <div key={event.id} className="flex">
+                <div className="flex flex-col items-center mr-4">
+                  <div
+                    className={`rounded-full p-2 ${getStatusColor(event.status)
+                      .replace("text", "text-white")
+                      .replace("100", "500")}`}
+                  >
+                    {getStatusIcon(event.status)}
                   </div>
-                </li>
-              ))}
-            </ul>
+                  {idx !== data.TrackingUpdates.length - 1 && (
+                    <div className="w-0.5 h-full bg-gray-200"></div>
+                  )}
+                </div>
+                <div className="flex-1 pb-8">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-medium text-gray-900">
+                        {event.status
+                          ?.replace(/_/g, " ")
+                          .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+                      </h4>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {formatShortDate(event.timestamp)}
+                      </p>
+                    </div>
+                    {event.location && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        {event.location}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-2 text-gray-700">{event.message}</p>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="border-t border-gray-200">
-            <dl>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Origin Name
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.Sender?.name}
-                </dd>
+          <div className="space-y-6">
+            <div className="bg-gray-50 rounded-lg p-5">
+              <h3 className="font-medium text-lg mb-4 flex items-center">
+                <User className="h-5 w-5 mr-2 text-gray-500" />
+                Sender & Receiver
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Sender
+                  </h4>
+                  <p className="font-medium">{data.sender?.name}</p>
+                  <p className="text-sm text-gray-600">{data.sender?.email}</p>
+                  <div className="mt-3 text-sm text-gray-700">
+                    <p>{data.originAddress}</p>
+                    <p>
+                      {data.originCity}, {data.originState}{" "}
+                      {data.originPostalCode}
+                    </p>
+                    <p>{data.originCountry}</p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Receiver
+                  </h4>
+                  <p className="font-medium">{data.recipient.name}</p>
+                  {data.recipient.email && (
+                    <p className="text-sm text-gray-600">
+                      {data.recipient.email}
+                    </p>
+                  )}
+                  {data.recipient.phone && (
+                    <p className="text-sm text-gray-600">
+                      {data.recipient.phone}
+                    </p>
+                  )}
+                  <div className="mt-3 text-sm text-gray-700">
+                    <p>{data.destinationAddress}</p>
+                    <p>
+                      {data.destinationCity}, {data.destinationState}{" "}
+                      {data.destinationPostalCode}
+                    </p>
+                    <p>{data.destinationCountry}</p>
+                  </div>
+                </div>
               </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Recipient Name
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.recipient.name}
-                </dd>
-              </div>
+            </div>
 
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Origin Address
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.originAddress}
-                </dd>
+            <div className="bg-gray-50 rounded-lg p-5">
+              <h3 className="font-medium text-lg mb-4 flex items-center">
+                <Box className="h-5 w-5 mr-2 text-gray-500" />
+                Package Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Package Type
+                  </h4>
+                  <p className="font-medium">{data.packages[0].packageType}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Dimensions
+                  </h4>
+                  <p className="font-medium">
+                    {data.packages[0].length} × {data.packages[0].width} ×{" "}
+                    {data.packages[0].height} cm
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Weight
+                  </h4>
+                  <p className="font-medium">{data.packages[0].weight} kg</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Declared Value
+                  </h4>
+                  <p className="font-medium">
+                    {data.packages[0].declaredValue
+                      ? `$${data.packages[0].declaredValue}`
+                      : "Not specified"}
+                  </p>
+                </div>
               </div>
-              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Destination Address
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.destinationAddress}
-                </dd>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-5">
+              <h3 className="font-medium text-lg mb-4 flex items-center">
+                <Truck className="h-5 w-5 mr-2 text-gray-500" />
+                Shipping Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Service Type
+                  </h4>
+                  <p className="font-medium">{data.serviceType}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Carrier
+                  </h4>
+                  <p className="font-medium">{data.carrier}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Tracking Number
+                  </h4>
+                  <p className="font-medium">{data.trackingNumber}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">
+                    Shipment Date
+                  </h4>
+                  <p className="font-medium">{formatDate(data.createdAt)}</p>
+                </div>
               </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Service Type
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 capitalize">
-                  {data.serviceType}
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Package Type
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.packages[0].packageType}
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Package Dimension (H * L * W)
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {data.packages[0].height *
-                    data.packages[0].length *
-                    data.packages[0].width}{" "}
-                  cm
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">
-                  Declared Value
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  $ {data.packages[0].declaredValue}
-                </dd>
-              </div>
-              {/* Additional shipment details can be added here */}
-            </dl>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function getStatusIcon(status: string | null) {
+  switch (status?.toLowerCase()) {
+    case "delivered":
+      return <Check className="h-4 w-4" />;
+    case "in_transit":
+      return <Truck className="h-4 w-4" />;
+    case "arrived":
+      return <Package className="h-4 w-4" />;
+    case "departed":
+      return <Truck className="h-4 w-4" />;
+    case "picked_up":
+      return <Package className="h-4 w-4" />;
+    case "on_hold":
+      return <AlertTriangle className="h-4 w-4" />;
+    case "information_received":
+      return <Home className="h-4 w-4" />;
+    case "failed":
+      return <AlertTriangle className="h-4 w-4" />;
+    default:
+      return <Package className="h-4 w-4" />;
+  }
 }
 
 function getStatusColor(status: string | null): string {
@@ -337,7 +479,7 @@ function getStatusColor(status: string | null): string {
       return "bg-indigo-100 text-indigo-800";
     case "picked_up":
       return "bg-amber-100 text-amber-800";
-    case "on_hold": // New status
+    case "on_hold":
       return "bg-orange-100 text-orange-800";
     case "information_received":
       return "bg-gray-100 text-gray-800";
