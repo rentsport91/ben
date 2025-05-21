@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 import { motion } from "motion/react";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useState, useTransition } from "react";
 import { registerAction } from "@/components/features/auth/action";
 import {
   Form,
@@ -22,14 +22,19 @@ import { useForm } from "react-hook-form";
 import {
   RegisterProps,
   RegisterSchema,
-} from "@/app/(auth)/_register/_definitions/schema";
+} from "@/app/(auth)/register/definitions/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, action, isPending] = useActionState(registerAction, null);
+  const [isPending, startTransition] = useTransition();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [formState, setFormState] = useState<{
+    success?: boolean;
+    message?: string;
+  } | null>(null);
   const router = useRouter();
   const form = useForm<RegisterProps>({
     resolver: zodResolver(RegisterSchema),
@@ -55,16 +60,27 @@ export const RegistrationForm = () => {
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("password", password);
-    action(formData);
 
-    if (!error?.success) {
-      toast.warning(error?.message);
-      return;
-    }
+    startTransition(async () => {
+      try {
+        // Call registerAction with the previous state and formData
+        const result = await registerAction(null, formData);
 
-    toast.success(error.message);
-    form.reset();
-    router.push("/login");
+        if (!result?.success) {
+          toast.warning(result?.message || "Registration failed");
+          setFormState(result);
+          return;
+        }
+
+        toast.success(result.message || "Account created successfully");
+        form.reset();
+        router.push("/login");
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        toast.error("An error occurred during registration");
+        setFormState({ success: false, message: "Registration failed" });
+      }
+    });
   };
 
   return (
