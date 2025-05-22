@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +41,6 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { shipmentSchema, ShipmentFormValues } from "@/store/schema";
 import { createShipment } from "./actions";
-import { useSession } from "next-auth/react";
 import { SHIPPING_OPTIONS } from "./type";
 
 // Package types for the dropdown
@@ -53,7 +54,7 @@ const PACKAGE_TYPES = [
 
 export default function CreateShipmentPage() {
   const router = useRouter();
-  const session = useSession();
+  const { status } = useSession();
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm<ShipmentFormValues>({
@@ -103,14 +104,37 @@ export default function CreateShipmentPage() {
     name: "packages",
   });
 
-  if (session.status !== "authenticated") {
-    router.push("/login");
-    return;
+  // Handle authentication redirect using useEffect
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  // Show loading state while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="px-7">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the form if not authenticated
+  if (status === "unauthenticated") {
+    return null;
   }
 
   const onSubmit = async (data: ShipmentFormValues) => {
     try {
       const formData = new FormData();
+
       // Add all shipment fields
       Object.entries(data).forEach(([key, value]) => {
         if (key !== "packages") {
@@ -122,6 +146,7 @@ export default function CreateShipmentPage() {
           }
         }
       });
+
       // Add package fields with array notation
       data.packages.forEach((pkg, index) => {
         Object.entries(pkg).forEach(([field, value]) => {
@@ -211,7 +236,7 @@ export default function CreateShipmentPage() {
                       <FormItem>
                         <FormLabel>Country</FormLabel>
                         <FormControl>
-                          <Input placeholder="Select Counrty" {...field} />
+                          <Input placeholder="Select Country" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
