@@ -39,6 +39,7 @@ import { signOut } from "next-auth/react";
 import { Logo } from "./logo";
 import { Notifications } from "./features/notification/notification";
 import { ActiveShipment } from "./features/dashboard/shipments/activeShipment";
+import { InstantNavLink } from "./instantLink";
 
 // Navigation items definition
 const mainNavItems = [
@@ -140,7 +141,7 @@ export const Header = () => {
               const isActive = pathname === item.href;
               return (
                 <li key={item.href}>
-                  <Link
+                  <InstantNavLink
                     href={item.href}
                     className={cn(
                       "flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-colors",
@@ -150,7 +151,7 @@ export const Header = () => {
                     )}
                   >
                     <span>{item.label}</span>
-                  </Link>
+                  </InstantNavLink>
                 </li>
               );
             })}
@@ -162,12 +163,12 @@ export const Header = () => {
           <div className="hidden lg:flex items-center gap-3 ">
             <Notifications />
             <ActiveShipment />
-            <Link
+            <InstantNavLink
               href="/shipments/create"
               className="bg-secondary text-white font-medium px-3 py-2 rounded-md"
             >
               Create Shipment
-            </Link>
+            </InstantNavLink>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
@@ -182,13 +183,13 @@ export const Header = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   {session.user.role === "ADMIN" && (
-                    <Link
+                    <InstantNavLink
                       href={"/dashboard"}
                       className="flex items-center space-x-2 rounded-md text-sm transition-colors"
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       <span>Dashboard</span>
-                    </Link>
+                    </InstantNavLink>
                   )}
                 </DropdownMenuItem>
 
@@ -196,13 +197,13 @@ export const Header = () => {
                   const Icon = item.icon;
                   return (
                     <DropdownMenuItem key={item.href} asChild>
-                      <Link
+                      <InstantNavLink
                         href={item.href}
                         className="flex cursor-pointer items-center gap-2"
                       >
                         <Icon className="h-4 w-4" />
                         <span>{item.label}</span>
-                      </Link>
+                      </InstantNavLink>
                     </DropdownMenuItem>
                   );
                 })}
@@ -282,7 +283,7 @@ export const Header = () => {
                     const isActive = pathname === item.href;
                     return (
                       <SheetClose key={item.href} asChild>
-                        <Link
+                        <InstantNavLink
                           href={item.href}
                           className={cn(
                             "flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
@@ -292,17 +293,17 @@ export const Header = () => {
                           )}
                         >
                           <span>{item.label}</span>
-                        </Link>
+                        </InstantNavLink>
                       </SheetClose>
                     );
                   })}
                   {session?.user.role === "ADMIN" && (
-                    <Link
+                    <InstantNavLink
                       href={"/dashboard"}
                       className="flex items-center space-x-2 rounded-md text-sm transition-colors px-3 py-1"
                     >
                       <span>Dashboard</span>
-                    </Link>
+                    </InstantNavLink>
                   )}
                   <div className="my-2 h-px w-full bg-border" />
 
@@ -323,24 +324,24 @@ export const Header = () => {
                       <div className="flex flex-col gap-3 px-3 py-1">
                         <ActiveShipment />
 
-                        <Link
+                        <InstantNavLink
                           href="/shipments/create"
                           className="bg-secondary text-white font-medium px-3 py-2 rounded-md w-52"
                         >
                           Create Shipment
-                        </Link>
+                        </InstantNavLink>
                       </div>
                       {authNavItems.authenticated.map((item) => {
                         const Icon = item.icon;
                         return (
                           <SheetClose key={item.href} asChild>
-                            <Link
+                            <InstantNavLink
                               href={item.href}
                               className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
                             >
                               <Icon className="h-4 w-4" />
                               <span>{item.label}</span>
-                            </Link>
+                            </InstantNavLink>
                           </SheetClose>
                         );
                       })}
@@ -357,12 +358,12 @@ export const Header = () => {
                     <>
                       {authNavItems.unauthenticated.map((item) => (
                         <SheetClose key={item.href} asChild>
-                          <Link
+                          <InstantNavLink
                             href={item.href}
                             className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
                           >
                             <span>{item.label}</span>
-                          </Link>
+                          </InstantNavLink>
                         </SheetClose>
                       ))}
                     </>
