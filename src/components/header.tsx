@@ -52,7 +52,7 @@ const mainNavItems = [
 
 const authNavItems = {
   unauthenticated: [
-    { href: "/register", label: "Register" },
+    // { href: "/register", label: "Register" },
     { href: "/login", label: "Login" },
   ],
   authenticated: [
