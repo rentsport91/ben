@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/constants/config/db";
-import { RegisterSchema } from "../../../app/(auth)/register/definitions/schema";
+import { RegisterSchema } from "../../../app/(auth)/_register/_definitions/schema";
 import bcrypt from "bcryptjs";
 import disposableEmailDomains from "disposable-email-domains";
 
